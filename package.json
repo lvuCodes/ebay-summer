@@ -1,0 +1,10 @@
+{
+  "name": "ebay-summer",
+  "version": "1.1.0",
+  "description": "Manifest V3 Chrome extension showing eBay landed-cost estimates",
+  "private": true,
+  "scripts": {
+    "test": "node --test \"test/*.test.js\"",
+    "test:coverage": "node --test --experimental-test-coverage --test-coverage-lines=78 --test-coverage-branches=92 --test-coverage-functions=75 \"test/*.test.js\""
+  }
+}

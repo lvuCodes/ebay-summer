@@ -44,7 +44,7 @@ body {
      as wide as its longest line. Capped so a stray long line can't run away. */
   width: fit-content;
   max-width: 780px;
-  font: 13px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif;
+  font: 12px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif;
   color: var(--fg);
   background: var(--bg);
   /* Toggling a switch shouldn't select the surrounding header/section text — a
@@ -80,7 +80,7 @@ textarea {
   margin: -14px -14px 0;
   padding: 14px 14px 8px;
   background: var(--bg);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 2px solid var(--border);
 }
 
 /* Tighten the gap between the reload button and the sticky border. */
@@ -89,7 +89,7 @@ textarea {
 }
 
 /* The header that opens each column shouldn't carry the divider rule. */
-.col > .group-header-row:first-child {
+.col>.group-header-row:first-child {
   margin-top: 0;
   padding-top: 0;
   border-top: none;
@@ -135,13 +135,14 @@ h1 {
   column-gap: 8px;
   row-gap: 10px;
 }
-.auction-grid > label[for] {
+
+.auction-grid>label[for] {
   white-space: nowrap;
 }
 
 /* The "keep ended badge" toggle has only a switch + label, no control/trailing —
    let its label run across the remaining tracks so it reads as one line. */
-.auction-grid > label.auction-grid__wide {
+.auction-grid>label.auction-grid__wide {
   grid-column: 2 / -1;
 }
 
@@ -170,7 +171,7 @@ h1 {
   justify-content: space-between;
   margin-top: 16px;
   padding-top: 12px;
-  border-top: 1px solid var(--border);
+  border-top: 2px solid var(--border);
 }
 
 /* Version marker, pushed to the far end of the footer by space-between. */
@@ -181,7 +182,7 @@ h1 {
 
 .section {
   margin: 4px 0 8px;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--fg);
 }
@@ -203,6 +204,7 @@ h1 {
   margin-top: 16px;
   margin-bottom: 10px;
 }
+
 .section-row .section {
   margin: 0;
 }
@@ -217,7 +219,7 @@ h1 {
   gap: 16px;
   margin: 14px 0 8px;
   padding-top: 12px;
-  border-top: 1px solid var(--border);
+  border-top: 2px solid var(--border);
 }
 
 .group-header {
@@ -272,6 +274,7 @@ h1 {
   row-gap: 10px;
   margin-bottom: 10px;
 }
+
 /* Label + ⓘ (+ "$" on the flat-amount row) span the toggle + label columns; flex
    (not inline-flex) so the head fills the spanned width and margin-left:auto can push
    the "$" to its right edge. */
@@ -282,12 +285,15 @@ h1 {
   gap: 8px;
   white-space: nowrap;
 }
+
 .ship-grid__head .unit--pre {
   margin-left: auto;
 }
+
 .ship-grid__head label {
   color: var(--fg);
 }
+
 /* Input (+ trailing "%") — the "%" hugs the input; the input's left edge is the cell
    edge, so it stays aligned with the flat-amount input above. */
 .ship-grid__val {
@@ -295,6 +301,7 @@ h1 {
   align-items: center;
   gap: 6px;
 }
+
 /* Tooltip left-anchored so it grows rightward and doesn't clip the popup's edge. */
 .ship-grid__head .info__tip {
   left: 0;

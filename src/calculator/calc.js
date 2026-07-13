@@ -158,6 +158,12 @@
       : "+ ship " + (unknownText || "n/a");
   }
 
+  // The tax rate as a display percent — "8.25%" — the one place a rate becomes
+  // its "X%" label, so the box and bid-calc sub-lines format it identically.
+  function pctText(taxRate) {
+    return `${(taxRate * 100).toFixed(2)}%`;
+  }
+
   // Pure text parts of the box, so label selection is testable without a DOM.
   // When itemHigh is a distinct higher price, the amount and the tax render as
   // ranges (low end -> high end); `range` tells makeBox to add the 🚦 prefix.
@@ -177,11 +183,11 @@
     return {
       label: "Est. total",
       amount,
-      sub: `incl. ${(taxRate * 100).toFixed(2)}% tax (${taxTxt}) ${shipLabel(shipping, shipUnknownText)}`,
+      sub: `incl. ${pctText(taxRate)} tax (${taxTxt}) ${shipLabel(shipping, shipUnknownText)}`,
       // The main listing box's sub line: the base price broken out so the addends
       // visibly sum to the est. total — "US $base + (X% tax → $tax) + $ship ship".
       // The tax group shows its rate resolving to its dollar amount; ship stays labelled.
-      breakdown: `${baseTxt} + (${(taxRate * 100).toFixed(2)}% tax → ${taxTxt}) ${shipLabel(shipping, shipUnknownText)}`,
+      breakdown: `${baseTxt} + (${pctText(taxRate)} tax → ${taxTxt}) ${shipLabel(shipping, shipUnknownText)}`,
       range: hasRange,
       // Numeric totals for the per-unit breakdown; high is null when not a range.
       // The *NoShip variants are item + tax only (shipping excluded), used when the
@@ -319,7 +325,7 @@
   // type into eBay's own counter field ("Your offer", quoted in that currency).
   function bidCalcParts(raw, shipping, taxRate, fx) {
     const { isFunction, value } = bidCalcInput(raw);
-    const pct = `${(taxRate * 100).toFixed(2)}%`;
+    const pct = pctText(taxRate);
     if (value == null || !Number.isFinite(value) || value < 0) {
       // No amount yet — show the rate + shipping, matching the estimation box's phrasing
       // but without a tax figure.
@@ -350,7 +356,7 @@
   // seller's currency (fxBidText) — the amount to enter in eBay's own offer field.
   function bidFromTotalParts(raw, shipping, taxRate, fx) {
     const { isFunction, value } = bidCalcInput(raw);
-    const pct = `${(taxRate * 100).toFixed(2)}%`;
+    const pct = pctText(taxRate);
     const ship = shipping || 0;
     if (value == null || !Number.isFinite(value) || value < 0) {
       return { isFunction, valid: false, value: null, sub: `incl. ${pct} tax ${shipLabel(shipping)}` };
