@@ -1,6 +1,6 @@
 # eBay Σummer
 
-**Version 1.1.0**
+**Version 1.1.1**
 
 A Manifest V3 Chrome extension that shows the approximate total cost — **item price + sales tax + shipping** — as a dashed-purple "Est. total" box on eBay pages, so you can compare landed cost across listings at a glance. It ships two features: the **Estimated Total Calculator** and **Auction Ending Notifications**.
 
@@ -13,13 +13,13 @@ A Manifest V3 Chrome extension that shows the approximate total cost — **item 
 
 ## Coverage
 
-| Page | URL | Placement |
-|---|---|---|
-| Listing | `/itm/…` | Box beside the main price, a compact box on each related-items carousel card, and — on auctions/Best Offers — a full-width bid calculator under the condition field |
-| Search | `/sch/…` | Compact box under each result's price |
-| Watchlist | `/mye/myebay/watchlist` | Compact box under each saved item's price |
-| Bids & Offers | `/mye/myebay/bidsoffers` | Compact box under each row's shipping cost |
-| Home | `/` | Amber box under each feed card's price (item + tax only) |
+| Page          | URL                      | Placement                                                                                                                                                           |
+| ------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Listing       | `/itm/…`                 | Box beside the main price, a compact box on each related-items carousel card, and — on auctions/Best Offers — a full-width bid calculator under the condition field |
+| Search        | `/sch/…`                 | Compact box under each result's price                                                                                                                               |
+| Watchlist     | `/mye/myebay/watchlist`  | Compact box under each saved item's price                                                                                                                           |
+| Bids & Offers | `/mye/myebay/bidsoffers` | Compact box under each row's shipping cost                                                                                                                          |
+| Home          | `/`                      | Amber box under each feed card's price (item + tax only)                                                                                                            |
 
 Each page type has its own on/off switch in the popup's **Show Est. Total On…** section. A master **Extension enabled** toggle (bottom-right of the popup) turns everything off at once.
 
