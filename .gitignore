@@ -1,11 +1,6 @@
-# Downloaded eBay page samples used only for local selector development.
-# Large (multi-MB saved pages) and not needed to build/run the extension, so
-# excluded from version control for this extension specifically.
-resources/
-
-# Screen-recording bug repros dropped in the extension root — keep them local.
-*.mov
-
 # Local-only
 .DS_Store
-/*_release.zip
+
+# In releases/: commit files (e.g. release-*.zip), ignore all subfolders.
+# Trailing slash matches directories only, so loose files stay tracked.
+/releases/*/
