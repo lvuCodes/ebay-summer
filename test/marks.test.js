@@ -2,7 +2,7 @@
 // (unavailable / dual-format) that decide whether the est-total boxes show.
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
-const { pickupOnlyFromLeaves, listingUnavailable, dualFormatListing } = require("./load-es.js");
+const { pickupOnlyFromLeaves, listingUnavailable, dualFormatListing, offerEntryStep } = require("./load-es.js");
 
 // --- pickupOnlyFromLeaves: pickup wins only with no shipping/delivery leaf --
 test("pickupOnlyFromLeaves: pickup mention, no shipping -> true", () => {
@@ -91,4 +91,29 @@ test("dualFormatListing: auction-only or Buy It Now-only -> false (no second box
 test("dualFormatListing: missing/invalid root -> false", () => {
   assert.equal(dualFormatListing(null), false);
   assert.equal(dualFormatListing({}), false);
+});
+
+// --- offerEntryStep: gate the "Make offer" calc to the injectable price-entry step --
+// A querySelector stub reporting whether the price-input block is present. The
+// price-entry step has `.bo-offer-section__wrapper .app-input-price__wrapper`; the
+// review/checkout step empties the body (content moves to a cross-origin iframe).
+function fakeOfferModal({ entry = false } = {}) {
+  return {
+    querySelector: (sel) =>
+      /app-input-price__wrapper/.test(sel) && entry ? { tag: "priceInput" } : null,
+  };
+}
+
+test("offerEntryStep: price-entry step (price input present) -> true (calc injected)", () => {
+  assert.equal(offerEntryStep(fakeOfferModal({ entry: true })), true);
+});
+
+test("offerEntryStep: review/checkout step (no price input) -> false (nothing to inject)", () => {
+  assert.equal(offerEntryStep(fakeOfferModal()), false);
+});
+
+test("offerEntryStep: missing/invalid root -> false", () => {
+  assert.equal(offerEntryStep(null), false);
+  assert.equal(offerEntryStep(undefined), false);
+  assert.equal(offerEntryStep({}), false);
 });
