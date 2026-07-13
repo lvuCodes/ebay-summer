@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>eBay Σummer — the approx. total cost on every eBay listing</title>
+<meta name="description" content="A Chrome extension that shows item price + sales tax + shipping as an Est. total box on eBay pages, so you can compare total cost across listings at a glance.">
+<link rel="icon" type="image/png" href="assets/icon128.png">
+<meta property="og:title" content="eBay Σummer">
+<meta property="og:description" content="See the approx. total cost — item + tax + shipping — on every eBay listing.">
+<meta property="og:image" content="assets/logo.png">
+<meta property="og:type" content="website">
+<style>
+  /* One fixed palette — the page owns its own background, so every visitor
+     sees the same calm, dim surface regardless of their OS theme. */
+  :root {
+    --purple: #6b3fa0;
+    --purple-dark: #4a2a73;
+    --purple-light: #b794e6;
+    --amber: #b8860b;
+    --orange: #d97706;
+    --ebay-red: #e53238;
+    --ebay-blue: #0064d2;
+    --ebay-yellow: #f5af02;
+    --ebay-green: #86b817;
+
+    --bg-card: #23252f;
+    --bg-elev: #282a36;
+    --text: #eceef5;
+    --text-soft: #b7b9c8;
+    --text-faint: #8a8ca0;
+    --border: #343648;
+    --shadow: 0 1px 3px rgba(0, 0, 0, .3), 0 12px 34px rgba(0, 0, 0, .28);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background:
+      radial-gradient(1100px 520px at 50% -10%, #2a2542 0%, rgba(42, 37, 66, 0) 62%),
+      #1a1b23;
+    background-attachment: fixed;
+    color: var(--text);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--purple-light); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  .brand-stripe {
+    height: 5px;
+    display: flex;
+  }
+
+  .brand-stripe span { flex: 1; }
+  .brand-stripe .r { background: var(--ebay-red); }
+  .brand-stripe .b { background: var(--ebay-blue); }
+  .brand-stripe .y { background: var(--ebay-yellow); }
+  .brand-stripe .g { background: var(--ebay-green); }
+
+  .wrap { max-width: 980px; margin: 0 auto; padding: 0 24px; }
+
+  /* ── Hero ── */
+  header.hero {
+    text-align: center;
+    padding: 64px 24px 48px;
+  }
+  .hero img.logo {
+    width: 132px; height: 132px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: var(--shadow);
+    margin-bottom: 22px;
+  }
+  .hero h1 {
+    font-size: clamp(2.4rem, 6vw, 3.4rem);
+    margin: 0 0 6px;
+    letter-spacing: -.02em;
+    font-weight: 800;
+  }
+  .hero .tagline {
+    font-size: clamp(1.05rem, 2.4vw, 1.3rem);
+    color: var(--text-soft);
+    max-width: 34ch;
+    margin: 0 auto 6px;
+  }
+  .hero .sub {
+    color: var(--text-faint);
+    font-size: .95rem;
+    max-width: 52ch;
+    margin: 12px auto 0;
+  }
+  .version-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: .8rem;
+    font-weight: 600;
+    color: var(--purple-light);
+    background: color-mix(in srgb, var(--purple) 22%, transparent);
+    border: 1px solid color-mix(in srgb, var(--purple) 45%, transparent);
+    padding: 4px 12px;
+    border-radius: 999px;
+    margin-bottom: 20px;
+  }
+
+  .cta-row {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 26px;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    font-size: .98rem;
+    padding: 12px 22px;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: transform .12s ease, box-shadow .12s ease;
+  }
+  .btn:hover { text-decoration: none; transform: translateY(-1px); }
+  .btn-primary {
+    background: var(--purple);
+    color: #fff;
+    box-shadow: 0 4px 14px color-mix(in srgb, var(--purple) 40%, transparent);
+  }
+  .btn-primary:hover { background: var(--purple-dark); }
+  .btn-ghost {
+    background: var(--bg-card);
+    color: var(--text);
+    border-color: var(--border);
+    box-shadow: var(--shadow);
+  }
+
+  /* ── Preview box ── */
+  .demo {
+    display: flex;
+    justify-content: center;
+    margin-top: 40px;
+  }
+  .est-box {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    border: 2px dashed var(--purple);
+    border-radius: 10px;
+    background: var(--bg-card);
+    padding: 14px 20px;
+    text-align: left;
+    box-shadow: var(--shadow);
+    max-width: 320px;
+  }
+  .est-box .label { font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: var(--text-faint); }
+  .est-box .total { font-size: 1.5rem; font-weight: 700; color: var(--purple-light); margin: 2px 0; }
+  .est-box .breakdown { font-size: .8rem; color: var(--text-soft); }
+
+  /* ── Sections ── */
+  section { padding: 44px 0; }
+  h2.section-title {
+    text-align: center;
+    font-size: 1.6rem;
+    margin: 0 0 6px;
+    letter-spacing: -.01em;
+  }
+  .section-lead {
+    text-align: center;
+    color: var(--text-faint);
+    margin: 0 auto 34px;
+    max-width: 50ch;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 18px;
+  }
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px;
+    box-shadow: var(--shadow);
+  }
+  .card .icon { font-size: 1.6rem; line-height: 1; margin-bottom: 10px; }
+  .card h3 { margin: 0 0 6px; font-size: 1.08rem; }
+  .card p { margin: 0; color: var(--text-soft); font-size: .92rem; }
+
+  /* ── Install ── */
+  .install {
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 34px;
+    box-shadow: var(--shadow);
+  }
+  ol.steps { margin: 0; padding: 0; list-style: none; counter-reset: step; }
+  ol.steps li {
+    counter-increment: step;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 10px 0;
+  }
+  ol.steps li::before {
+    content: counter(step);
+    flex: 0 0 auto;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--purple);
+    color: #fff;
+    font-weight: 700;
+    font-size: .85rem;
+    display: flex; align-items: center; justify-content: center;
+  }
+  ol.steps li div { padding-top: 2px; }
+  code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: .88em;
+    background: color-mix(in srgb, var(--purple) 10%, transparent);
+    padding: 1px 6px;
+    border-radius: 5px;
+  }
+  .note { color: var(--text-faint); font-size: .85rem; margin-top: 18px; }
+
+  /* ── Footer ── */
+  footer {
+    text-align: center;
+    padding: 40px 24px 56px;
+    color: var(--text-faint);
+    font-size: .88rem;
+    border-top: 1px solid var(--border);
+    margin-top: 20px;
+  }
+  footer .sig { color: var(--text-soft); }
+</style>
+</head>
+<body>
+<div class="brand-stripe"><span class="r"></span><span class="b"></span><span class="y"></span><span class="g"></span></div>
+
+<header class="hero">
+  <img class="logo" src="assets/logo.png" alt="eBay Σummer logo">
+  <div><span class="version-badge">● Manifest V3 · v1.0.0</span></div>
+  <h1>eBay Σummer</h1>
+  <p class="tagline">See the <strong>approx. total cost</strong> on every eBay listing.</p>
+  <p class="sub">A Chrome extension that adds item price + sales tax + shipping as an <em>Est. total</em> box on eBay pages — so you compare total cost, not sticker price, at a glance.</p>
+  <div class="cta-row">
+    <a class="btn btn-primary" href="https://github.com/lvuCodes/ebay-summer">Get it on GitHub ↗</a>
+    <a class="btn btn-ghost" href="#install">How to install</a>
+  </div>
+  <div class="demo">
+    <div class="est-box">
+      <div class="label">Est. total 🟢</div>
+      <div class="total">US $53.30</div>
+      <div class="breakdown">incl. 8.25% tax ($3.30) + free ship</div>
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <h2 class="section-title">What it does</h2>
+    <p class="section-lead">Two features in v1.0.0 — a landed-cost calculator that follows you across eBay, and auction-ending alerts.</p>
+    <div class="grid">
+      <div class="card">
+        <div class="icon">🧮</div>
+        <h3>Estimated total</h3>
+        <p>A dashed-purple box beside the price shows item + tax + shipping on listing, search, watchlist, bids/offers, and home pages.</p>
+      </div>
+      <div class="card">
+        <div class="icon">🟢🟡🔴</div>
+        <h3>Shipping dots</h3>
+        <p>A colored dot flags shipping at a glance — free, high on one count, high on both, or 📍🏃 pickup-only — against your own thresholds.</p>
+      </div>
+      <div class="card">
+        <div class="icon">🔨</div>
+        <h3>Bid calculator</h3>
+        <p>On auctions and Best Offer listings, type a prospective bid (or an <code>=</code> formula) and see the live landed total — no <code>eval()</code>.</p>
+      </div>
+      <div class="card">
+        <div class="icon">⏰</div>
+        <h3>Auction alerts</h3>
+        <p>Get a sound + system notification as an auction crosses your "seconds left" thresholds. Click the alert to jump straight to the tab.</p>
+      </div>
+      <div class="card">
+        <div class="icon">📦</div>
+        <h3>Per-item breakdown</h3>
+        <p>Expand any box for a live <em>@ $X.XX/unit</em> figure — divide a lot's total by a count, formulas included, for accurate per-piece pricing.</p>
+      </div>
+      <div class="card">
+        <div class="icon">🌍</div>
+        <h3>Ranges &amp; currencies</h3>
+        <p>Multi-variation price ranges and non-US-currency listings both compute correctly from the US figures eBay shows.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="install">
+  <div class="wrap">
+    <h2 class="section-title">Install it</h2>
+    <p class="section-lead">Loads unpacked in under a minute — no store listing needed.</p>
+    <div class="install">
+      <ol class="steps">
+        <li><div><a href="https://github.com/lvuCodes/ebay-summer">Download or clone the repo</a> from GitHub.</div></li>
+        <li><div>Open <code>chrome://extensions</code> and enable <strong>Developer mode</strong> (top-right).</div></li>
+        <li><div>Click <strong>Load unpacked</strong> and select the project folder.</div></li>
+        <li><div>Visit any eBay listing, search, or bids/offers page — the boxes appear automatically.</div></li>
+      </ol>
+      <p class="note">Tune the tax rate, shipping-flag thresholds, per-page toggles, and auction alerts from the toolbar popup. Every field takes effect on open eBay tabs live.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p class="sig">eBay Σummer · Manifest V3 Chrome extension</p>
+    <p>Not affiliated with eBay Inc. · <a href="https://github.com/lvuCodes/ebay-summer">Source on GitHub</a></p>
+  </div>
+</footer>
+</body>
+</html>
