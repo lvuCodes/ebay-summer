@@ -1,0 +1,57 @@
+{
+  "manifest_version": 3,
+  "name": "eBay Σummer",
+  "version": "1.0.0",
+  "description": "Shows the true landed cost (item + sales tax on the item + shipping) on eBay listing, search, and bids/offers pages.",
+  "permissions": ["storage", "notifications"],
+  "host_permissions": ["*://*.ebay.com/*"],
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "eBay Σummer"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://www.ebay.com/*"],
+      "js": ["src/core/early.js"],
+      "run_at": "document_start",
+      "all_frames": false
+    },
+    {
+      "matches": ["*://www.ebay.com/*"],
+      "js": [
+        "src/core/registry.js",
+        "src/core/sanitize.js",
+        "src/notifications/sounds.js",
+        "src/calculator/schema.js",
+        "src/notifications/schema.js",
+        "src/core/defaults.js",
+        "src/core/config.js",
+        "src/core/settings.js",
+        "src/calculator/calc.js",
+        "src/calculator/live.js",
+        "src/calculator/css-box.js",
+        "src/calculator/css-widgets.js",
+        "src/calculator/pickup.js",
+        "src/calculator/box.js",
+        "src/calculator/bid-calc.js",
+        "src/calculator/render-cards.js",
+        "src/calculator/render-listing.js",
+        "src/calculator/feature.js",
+        "src/notifications/alerts.js",
+        "src/notifications/notify.js",
+        "src/core/style.js",
+        "src/core/content.js"
+      ],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ]
+}
