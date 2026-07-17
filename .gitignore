@@ -1,5 +1,6 @@
 # Local-only
 .DS_Store
+CLAUDE.md
 
 # In releases/: commit files (e.g. release-*.zip), ignore all subfolders.
 # Trailing slash matches directories only, so loose files stay tracked.
