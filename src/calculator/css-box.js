@@ -188,6 +188,14 @@
     font-weight: 800 !important;
     color: var(--ink) !important;
   }
+  /* A ranged total is italicised to match how eBay spells a range on its own
+     cards. The flag emoji stays upright — italic on an emoji reads as a glitch. */
+  .ebay-estimation .ebay-estimation__amount--range {
+    font-style: italic !important;
+  }
+  .ebay-estimation .ebay-estimation__amount--range .ebay-estimation__flag {
+    font-style: normal !important;
+  }
   /* Emoji carry taller intrinsic metrics than text; pin line-height so a dot/
      range flag can't stretch the amount line past a text-only box's height. */
   .ebay-estimation .ebay-estimation__flag {

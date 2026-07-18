@@ -6,7 +6,7 @@
 (function () {
   "use strict";
   const ES = (globalThis.ES = globalThis.ES || {});
-  const { parseMoney, parseMoneyUS, parseMoneyRange, firstAmount, modalOfferUSD, bidModalFigures, makeBox, makeBidCalc, findShipping, isPickupOnly, listingIsPickupOnly, CARD_SEL, CARD_PRICE_SEL, insertCardBox } =
+  const { parseMoney, parseMoneyUS, parseMoneyRange, firstAmount, modalOfferUSD, bidModalFigures, makeBox, makeBidCalc, findShipping, isPickupOnly, listingIsPickupOnly, CARD_SEL, CARD_PRICE_SEL, cardPriceText, insertCardBox } =
     ES;
 
   // A price "leaf" such as "$12.34", "US $1,200", or a "$171 - $796" range.
@@ -411,7 +411,7 @@
     document.querySelectorAll(CARD_SEL).forEach((card) => {
       if (card.querySelector("[data-ebay-total]")) return; // already done
       const priceEl = card.querySelector(CARD_PRICE_SEL);
-      const { low, high } = parseMoneyRange(priceEl && priceEl.textContent);
+      const { low, high } = parseMoneyRange(cardPriceText(priceEl));
       if (low == null) return;
       // No per-unit toggle on the listing page's non-main cards — their panel is
       // unreachable (eBay's card-click navigation can't be reliably suppressed).

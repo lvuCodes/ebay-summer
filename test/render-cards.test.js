@@ -92,15 +92,40 @@ test("the price is readable from either markup", () => {
   }
 });
 
-test("insertCardBox lands the box in the card header for either markup", () => {
-  for (const [make, label] of [[oldCard, "old"], [newCard, "reskinned"]]) {
+// Asserts the EXACT anchor class, not /header/ — both anchors contain "header",
+// so the loose form passed even when the box landed in the wrong one.
+test("insertCardBox lands the box in each markup's own header", () => {
+  for (const [make, label, want] of [
+    [oldCard, "old", "su-item-card__header"],
+    [newCard, "reskinned", "su-card-container__header"],
+  ]) {
     const card = make("$20.00");
     pageOf([card]);
     const box = el("div", { attrs: { "data-ebay-total": "" } });
     ES.insertCardBox(card, card.querySelector(ES.CARD_PRICE_SEL), box);
-    assert.match(box.parentElement.className, /header/,
+    assert.equal(box.parentElement.className, want,
       `${label} card: box landed in .${box.parentElement.className}`);
   }
+});
+
+// A selector list resolves in DOCUMENT order, not list order, so the outer
+// container header would win over the inner one on an old card carrying both —
+// silently moving the box relative to where v1.1.0 put it.
+test("insertCardBox prefers the inner header when a card carries both", () => {
+  const card = el("li", { class: "su-item-card", children: [
+    el("div", { class: "su-card-container__header", children: [
+      el("div", { class: "su-item-card__header", children: [
+        el("div", { class: "su-item-card__title", text: "A thing" }),
+      ] }),
+      el("div", { class: "su-item-card__price-container", children: [
+        el("span", { class: "su-item-card__price", text: "$20.00" }),
+      ] }),
+    ] }),
+  ] });
+  pageOf([card]);
+  const box = el("div", { attrs: { "data-ebay-total": "" } });
+  ES.insertCardBox(card, card.querySelector(ES.CARD_PRICE_SEL), box);
+  assert.equal(box.parentElement.className, "su-item-card__header");
 });
 
 // Every anchor missing — the shape a further reskin would take. The box must
@@ -115,6 +140,75 @@ test("insertCardBox falls back into the card when no anchor is recognised", () =
   const box = el("div", { attrs: { "data-ebay-total": "" } });
   ES.insertCardBox(card, card.querySelector(ES.CARD_PRICE_SEL), box);
   assert.ok(card.querySelector("[data-ebay-total]"), "box was dropped entirely");
+});
+
+// --- price ranges ----------------------------------------------------------
+// Shapes copied from debug/search-with-range.html. The reskin splits a range
+// across three sibling .s-card__price spans in ONE attribute row, so reading a
+// single element drops the high end and understates the estimate.
+function rangeCard(low, high) {
+  return el("li", { class: "s-card", children: [
+    el("div", { class: "su-card-container__content", children: [
+      el("div", { class: "su-card-container__header" }),
+      el("div", { class: "s-card__attribute-row", children: [
+        el("span", { class: "su-styled-text primary bold large-1 s-card__price", text: low }),
+        el("span", { class: "su-styled-text primary bold default s-card__price", text: " to " }),
+        el("span", { class: "su-styled-text primary bold large-1 s-card__price", text: high }),
+      ] }),
+      el("div", { class: "s-card__attribute-row", children: [
+        el("span", { class: "su-styled-text secondary large", text: "Buy It Now" }),
+      ] }),
+    ] }),
+  ] });
+}
+
+test("a split range reads both ends, not just the low span", () => {
+  const card = rangeCard("$10.75", "$30.93");
+  pageOf([card]);
+  const text = ES.cardPriceText(card.querySelector(ES.CARD_PRICE_SEL));
+  const { low, high } = ES.parseMoneyRange(text);
+  assert.equal(low, 10.75);
+  assert.equal(high, 30.93, "high end dropped — the box would understate the range");
+});
+
+test("a single-price card is unaffected by the range join", () => {
+  const card = newCard("$20.00");
+  pageOf([card]);
+  assert.equal(ES.cardPriceText(card.querySelector(ES.CARD_PRICE_SEL)), "$20.00");
+});
+
+// An auction+BIN card carries two unrelated prices in SEPARATE rows. Joining
+// across the whole card would invent a range spanning two different offers.
+test("a second price in another row is not folded into the range", () => {
+  const card = el("li", { class: "s-card", children: [
+    el("div", { class: "su-card-container__content", children: [
+      el("div", { class: "s-card__attribute-row", children: [
+        el("span", { class: "s-card__price", text: "$10.00" }),
+      ] }),
+      el("div", { class: "s-card__attribute-row", children: [
+        el("span", { text: "0 bids" }),
+      ] }),
+      el("div", { class: "s-card__attribute-row", children: [
+        el("span", { class: "s-card__price", text: "$13.00" }),
+      ] }),
+    ] }),
+  ] });
+  pageOf([card]);
+  const { low, high } = ES.parseMoneyRange(ES.cardPriceText(card.querySelector(ES.CARD_PRICE_SEL)));
+  assert.equal(low, 10);
+  assert.equal(high, null, "the Buy It Now price was folded in as a range end");
+});
+
+test("old markup keeps its single-element range string", () => {
+  const card = oldCard("$171 - $796");
+  pageOf([card]);
+  const { low, high } = ES.parseMoneyRange(ES.cardPriceText(card.querySelector(ES.CARD_PRICE_SEL)));
+  assert.equal(low, 171);
+  assert.equal(high, 796);
+});
+
+test("cardPriceText tolerates a card with no price element", () => {
+  assert.equal(ES.cardPriceText(null), null);
 });
 
 test("shipping is read off the reskinned card's attribute row", () => {
