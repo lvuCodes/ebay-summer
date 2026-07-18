@@ -1,31 +1,6 @@
 {
   "releases": [
     {
-      "version": "1.1.1",
-      "unreleased": true,
-      "summary": "Cosmetic and organizational release — visual polish and internal cleanup only, with no change to how the calculator, tax, shipping, or alerts behave.",
-      "groups": [
-        {
-          "type": "changed",
-          "items": [
-            {
-              "lead": "Purple-logo extension icons.",
-              "body": "The 16 / 48 / 128 px action icons are regenerated from the purple logo so the toolbar button and `chrome://extensions` card match the rest of the brand."
-            },
-            {
-              "lead": "Estimation box and widget polish.",
-              "body": "The estimated-total box and bid-calculator widgets are restyled, and the home page gains an amber tooltip."
-            },
-            {
-              "lead": "Internal cleanup, no behavior change.",
-              "body": "Per-feature value sanitizers move next to the settings they guard, a shared tax-rate percent formatter is factored out, and GPL license headers are added — refactors that leave the extension's behavior identical."
-            }
-          ]
-        }
-      ],
-      "snapshot": "releases/v1.1.1/"
-    },
-    {
       "version": "1.1.0",
       "date": "2026-07-13",
       "summary": "Fixes the bid calculator's injection into eBay's redesigned Best-Offer \"Make offer\" lightbox.",
