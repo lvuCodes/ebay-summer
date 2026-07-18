@@ -6,3 +6,14 @@ CLAUDE.md
 # Trailing slash matches directories only, so loose files stay tracked.
 /releases/*/
 /.vscode
+
+# Generated site output. The landing page + changelog are built from site/ (Vite)
+# and published straight to GitHub Pages by the deploy workflow, so the build
+# output is never committed here.
+docs/
+
+# Dependencies (installed via npm; not tracked).
+node_modules/
+
+# Saved eBay page captures for selector debugging (multi-MB, not source)
+debug/

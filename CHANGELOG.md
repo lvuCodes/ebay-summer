@@ -2,16 +2,23 @@
 
 All notable changes to eBay Σummer. Versions follow the extension's `manifest.json` version, and each release is packaged as a zip under [releases/](releases/).
 
-## [1.1.1] — 2026-07-17
+## [1.1.1] — 2026-07-18
 
-Cosmetic and organizational release — visual polish and internal cleanup only, with no change to how the calculator, tax, shipping, or alerts behave.
+Restores the estimated total box on search results, which eBay's July 2026 card reskin had silently disabled.
+
+### Fixed
+
+- **Estimated total box on search results.** eBay renamed the search-result card markup — `.su-item-card` became `.s-card`, its price moved from `.su-item-card__price-container` into a `.s-card__attribute-row`, and the card's own header element was dropped. The old class names matched nothing, so no boxes were drawn on search. Both the old and the reskinned markup are now matched, so pages still serving the old layout keep the box exactly where it was.
+- **Understated totals on price ranges.** The reskin splits a range across three separate elements (`$10.75` · ` to ` · `$30.93`) where the old markup held it in one, so only the low end was read and the estimate ignored the top of the range — on the 18 July capture, 21 of 250 results. The range is now reassembled from the price's own attribute row, which leaves an auction card's separate Buy It Now price out of it.
+- **Related-item carousels on listing pages.** These carry search-style cards and take the same fixes.
 
 ### Changed
 
-- **Purple-logo extension icons.** The 16 / 48 / 128 px action icons are regenerated from the purple logo so the toolbar button and `chrome://extensions` card match the rest of the brand.
-- **Estimation box and widget polish.** The estimated-total box and bid-calculator widgets are restyled, and the home page gains an amber tooltip.
-- **Internal cleanup, no behavior change.** Per-feature value sanitizers move next to the settings they guard, a shared tax-rate percent formatter is factored out, and GPL license headers are added — refactors that leave the extension's behavior identical.
-- Release packages are renamed to drop the `release-` prefix: `v1.0.0.zip`, `v1.1.0.zip`, `v1.1.1.zip`.
+- **Ranged totals are italicised**, matching how eBay spells a ranged price on its own cards. This is independent of the "Warn on ranged items" toggle, which still owns the 🚦 flag.
+
+### Known Issues
+
+- Recently viewed does not draw boxes — eBay's markup moved there too, and no capture is on hand to pin the new selectors. Its toggle is hidden for this release rather than offering a switch that does nothing; the setting itself is untouched, so turning it back on later restores whatever was set.
 
 Package: [`releases/v1.1.1.zip`](releases/v1.1.1.zip)
 

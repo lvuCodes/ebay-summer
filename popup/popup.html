@@ -5,276 +5,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="popup.css" />
     <link rel="stylesheet" href="popup-controls.css" />
-    <title>eBay Σummer [dev]</title>
+    <title>eBay Σummer</title>
   </head>
   <body>
+    <!-- Shell chrome only. Every feature section is mounted into #col-1 / #col-2
+         by popup.js from the sections each feature's popup.js registered, so a
+         build that omits a feature's <script> lines below gets no markup for it. -->
     <div class="sticky-top">
       <header class="header">
-        <h1>eBay Σummer [dev]</h1>
+        <h1>eBay Σummer</h1>
         <label class="switch switch--master"><span class="switch__label">Extension enabled</span><input type="checkbox" id="enabled" /><span class="switch__slider"></span></label>
       </header>
       <button type="button" id="reload-ebay" class="btn">↻ Reload all eBay tabs</button>
     </div>
 
     <div class="cols">
-      <div class="col">
-        <div class="group-header-row">
-          <p class="group-header">Estimated Total Calculator</p>
-          <label class="switch switch--header"><input type="checkbox" id="sec-esttotal" /><span class="switch__slider"></span></label>
-        </div>
-        <div class="group-body" id="body-esttotal">
-          <p class="hint hint--gap">Tabs recalculate live.</p>
-
-          <div class="row">
-            <label for="tax" class="row-heading">Sales tax</label>
-            <input type="number" id="tax" min="0" step="0.01" inputmode="decimal" />
-            <span class="unit">%</span>
-          </div>
-
-          <p class="hint hint--gap">Tax applies to the item price only.</p>
-
-          <div class="section-row">
-            <p class="section">Flag shipping when it exceeds…</p>
-            <label class="switch switch--inline"><input type="checkbox" id="flag-shipping" /><span class="switch__slider"></span></label>
-          </div>
-          <div class="group-body" id="body-shipflag">
-            <div class="ship-grid">
-              <div class="ship-grid__head">
-                <label for="ship-floor">Flat amount</label>
-                <span class="info" tabindex="0" role="note" aria-label="Warns when shipping exceeds this flat dollar amount.">ⓘ<span class="info__tip">Warns when shipping exceeds this flat dollar amount.</span></span>
-                <span class="unit unit--pre">$</span>
-              </div>
-              <div class="ship-grid__val">
-                <input type="number" id="ship-floor" min="0" step="1" inputmode="decimal" />
-              </div>
-
-              <div class="ship-grid__head">
-                <label for="ship-pct">% of item</label>
-                <span class="info" tabindex="0" role="note" aria-label="Warns when shipping is above this share of the item's total price to catch cheap items with inflated shipping. Example: at 50%, a $10 item with shipping fees of $5 or more is flagged.">ⓘ<span class="info__tip">Warns when shipping is above this share of the item's total price to catch cheap items with inflated shipping. Example: at 50%, a $10 item with shipping fees of $5 or more is flagged.</span></span>
-              </div>
-              <div class="ship-grid__val">
-                <input type="number" id="ship-pct" min="0" step="1" inputmode="decimal" />
-                <span class="unit">%</span>
-              </div>
-            </div>
-
-            <p class="hint hint--center">🟢 free · 🟡 high · 🔴 really high · 📍🏃 pickup only</p>
-          </div>
-        </div>
-
-        <div class="group-header-row" id="header-showtotal">
-          <p class="group-header">Show Est. Total On…</p>
-          <label class="switch switch--header" title="Toggle every page at once"><input type="checkbox" id="page-all" /><span class="switch__slider"></span></label>
-        </div>
-        <div class="group-body" id="body-showtotal">
-          <div class="switch-row">
-            <label class="switch"><input type="checkbox" id="page-home" /><span class="switch__slider"></span><span class="switch__label">Home page</span></label>
-            <span class="info" tabindex="0" role="note" aria-label="Amber boxes: the home feed has no shipping data, so totals are item + tax only.">ⓘ<span class="info__tip">Amber boxes: the home feed has no shipping data, so totals are item + tax only.</span></span>
-          </div>
-          <label class="switch"><input type="checkbox" id="page-search" /><span class="switch__slider"></span><span class="switch__label">Search results</span></label>
-          <label class="switch"><input type="checkbox" id="page-listing" /><span class="switch__slider"></span><span class="switch__label">Listing pages</span></label>
-          <label class="switch"><input type="checkbox" id="page-watchlist" /><span class="switch__slider"></span><span class="switch__label">Watchlist</span></label>
-          <label class="switch"><input type="checkbox" id="page-bids" /><span class="switch__slider"></span><span class="switch__label">Bids &amp; Offers</span></label>
-          <label class="switch"><input type="checkbox" id="page-summary" /><span class="switch__slider"></span><span class="switch__label">Summary</span></label>
-          <label class="switch"><input type="checkbox" id="page-rvi" /><span class="switch__slider"></span><span class="switch__label">Recently viewed</span></label>
-          <label class="switch"><input type="checkbox" id="page-saved" /><span class="switch__slider"></span><span class="switch__label">Saved feed</span></label>
-        </div>
-
-        <div class="group-header-row">
-          <p class="group-header">Custom View</p>
-          <label class="switch switch--header"><input type="checkbox" id="sec-customview" /><span class="switch__slider"></span></label>
-        </div>
-        <div class="group-body" id="body-customview">
-          <label class="switch"><input type="checkbox" id="infinite-scroll" /><span class="switch__slider"></span><span class="switch__label">Infinite scrolling (home)</span></label>
-          <label class="switch"><input type="checkbox" id="full-width" /><span class="switch__slider"></span><span class="switch__label">Full-width pages</span></label>
-
-          <p class="section section--spaced">Content</p>
-          <label class="switch"><input type="checkbox" id="show-live" /><span class="switch__slider"></span><span class="switch__label">eBay Live (all pages)</span></label>
-          <div class="switch-row">
-            <label class="switch"><input type="checkbox" id="show-sponsored-stores" /><span class="switch__slider"></span><span class="switch__label">Sponsored store ads</span></label>
-            <span class="info" tabindex="0" role="note" aria-label="Hidden on all pages except search results.">ⓘ<span class="info__tip">Hidden on all pages except search results.</span></span>
-          </div>
-
-          <div class="radio-row">
-            <span class="radio-row__label">Goldin</span>
-            <div class="radio-group">
-              <label class="radio"><input type="radio" name="goldin" value="show" /><span>Show</span></label>
-              <label class="radio"><input type="radio" name="goldin" value="hide" /><span>Hide</span></label>
-              <label class="radio"><input type="radio" name="goldin" value="flag" /><span>Flag</span></label>
-            </div>
-          </div>
-
-          <p class="section section--spaced">Search Page</p>
-          <div class="radio-row">
-            <span class="radio-row__label">Filters</span>
-            <div class="radio-group">
-              <label class="radio"><input type="radio" name="filter-mode" value="show" /><span>Show</span></label>
-              <label class="radio"><input type="radio" name="filter-mode" value="hide" /><span>Hide</span></label>
-              <label class="radio"><input type="radio" name="filter-mode" value="collapsible" /><span>Collapsible</span></label>
-            </div>
-          </div>
-          <div class="radio-row" id="filter-expand-row">
-            <span class="radio-row__label">Expand on</span>
-            <div class="radio-group">
-              <label class="radio"><input type="radio" name="filter-expand" value="hover" /><span>Hover</span></label>
-              <label class="radio"><input type="radio" name="filter-expand" value="click" /><span>Click</span></label>
-            </div>
-          </div>
-
-          <p class="section section--spaced">Bids &amp; Offers Page</p>
-          <div class="switch-row">
-            <label class="switch"><input type="checkbox" id="show-bids" /><span class="switch__slider"></span><span class="switch__label">Bids section</span></label>
-            <button type="button" id="bids-cols-toggle" class="subhead subhead--inline" aria-expanded="true"><span class="subhead__caret">▾</span> Additional options</button>
-          </div>
-          <div id="bids-columns" class="switch-sub">
-            <div id="bids-cols-body">
-              <label class="switch"><input type="checkbox" id="show-checkbox" /><span class="switch__slider"></span><span class="switch__label">Checkbox column</span></label>
-              <label class="switch"><input type="checkbox" id="show-buttons" /><span class="switch__slider"></span><span class="switch__label">Buttons column</span></label>
-            </div>
-          </div>
-          <div class="switch-row">
-            <label class="switch"><input type="checkbox" id="show-offers" /><span class="switch__slider"></span><span class="switch__label">Offers section</span></label>
-            <button type="button" id="offers-cols-toggle" class="subhead subhead--inline" aria-expanded="true"><span class="subhead__caret">▾</span> Additional options</button>
-          </div>
-          <div id="offers-columns" class="switch-sub">
-            <div id="offers-cols-body">
-              <label class="switch"><input type="checkbox" id="show-offers-checkbox" /><span class="switch__slider"></span><span class="switch__label">Checkbox column</span></label>
-              <label class="switch"><input type="checkbox" id="show-offers-buttons" /><span class="switch__slider"></span><span class="switch__label">Buttons column</span></label>
-            </div>
-          </div>
-          <div class="switch-row">
-            <label class="switch"><input type="checkbox" id="show-didntwin" /><span class="switch__slider"></span><span class="switch__label">Didn't&nbsp;Win section</span></label>
-            <button type="button" id="didntwin-cols-toggle" class="subhead subhead--inline" aria-expanded="true"><span class="subhead__caret">▾</span> Additional options</button>
-          </div>
-          <div id="didntwin-columns" class="switch-sub">
-            <div id="didntwin-cols-body">
-              <label class="switch"><input type="checkbox" id="show-didntwin-checkbox" /><span class="switch__slider"></span><span class="switch__label">Checkbox column</span></label>
-              <label class="switch"><input type="checkbox" id="show-didntwin-buttons" /><span class="switch__slider"></span><span class="switch__label">Buttons column</span></label>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="col">
-        <div class="group-header-row">
-          <p class="group-header">Auction Ending Notification</p>
-          <label class="switch switch--header"><input type="checkbox" id="sec-auction" /><span class="switch__slider"></span></label>
-        </div>
-        <div class="group-body" id="body-auction">
-          <p class="hint hint--gap">Badge notifications appear at the given intervals and may be clicked for instant navigation. They auto-dismiss when the auction ends.</p>
-          <div class="auction-grid">
-            <label class="switch switch--inline"><input type="checkbox" id="notify-sound-enabled" /><span class="switch__slider"></span></label>
-            <label for="notify-sound">Sound</label>
-            <select id="notify-sound">
-              <option value="coin">Coin</option>
-              <option value="chime">Chime</option>
-              <option value="bell">Bell</option>
-              <option value="ding">Ding</option>
-              <option value="arcade">Arcade</option>
-            </select>
-            <button type="button" id="notify-preview" class="btn-mini" title="Play sound">▶</button>
-
-            <label class="switch switch--inline"><input type="checkbox" id="notify-1-enabled" /><span class="switch__slider"></span></label>
-            <label for="notify-1">First alert</label>
-            <input type="number" id="notify-1" min="0" step="1" inputmode="numeric" />
-            <span class="unit">seconds</span>
-
-            <label class="switch switch--inline"><input type="checkbox" id="notify-2-enabled" /><span class="switch__slider"></span></label>
-            <label for="notify-2">Second alert</label>
-            <input type="number" id="notify-2" min="0" step="1" inputmode="numeric" />
-            <span class="unit">seconds</span>
-
-            <label class="switch switch--inline"><input type="checkbox" id="notify-ended-persist" /><span class="switch__slider"></span></label>
-            <label for="notify-ended-persist" class="auction-grid__wide">Persistent auction ended notification</label>
-          </div>
-        </div>
-
-        <div class="group-header-row">
-          <p class="group-header">Listing Highlights</p>
-          <label class="switch switch--header"><input type="checkbox" id="sec-highlight" /><span class="switch__slider"></span></label>
-        </div>
-        <div class="group-body" id="body-highlight">
-          <label class="switch"><input type="checkbox" id="flag-range" /><span class="switch__slider"></span><span class="switch__label">🚦 Warn on ranged items</span></label>
-
-          <p class="section section--spaced">Keyword highlights</p>
-          <p class="hint">May be inaccurate — use caution.</p>
-          <p class="hint hint--bullet">• Comma-separated keywords to flag, with a badge emoji per highlight.</p>
-          <p class="hint hint--bullet hint--gap">• If a title matches more than one, the strongest wins: negative &gt; positive &gt; neutral.</p>
-
-          <label class="switch"><input type="checkbox" id="hl-pos-enabled" /><span class="switch__slider"></span><span class="switch__label">Positive (desired) — green</span></label>
-          <div class="row row--fill">
-            <select id="hl-pos-emoji" class="select--emoji" title="Badge emoji">
-              <option value="">—</option>
-              <option value="🎲">🎲</option>
-              <option value="⭐">⭐</option>
-              <option value="🔥">🔥</option>
-              <option value="✅">✅</option>
-              <option value="⚠️">⚠️</option>
-              <option value="💎">💎</option>
-              <option value="👀">👀</option>
-              <option value="🚩">🚩</option>
-              <option value="🚫">🚫</option>
-            </select>
-            <input type="text" id="hl-pos-terms" class="text-input" placeholder="desired keywords" />
-            <button type="button" id="hl-pos-reset" class="btn-mini" title="Clear positive terms">×</button>
-          </div>
-
-          <label class="switch"><input type="checkbox" id="hl-neutral-enabled" /><span class="switch__slider"></span><span class="switch__label">Neutral (caution) — grey</span></label>
-          <div class="row row--fill">
-            <select id="hl-neutral-emoji" class="select--emoji" title="Badge emoji">
-              <option value="">—</option>
-              <option value="🎲">🎲</option>
-              <option value="⭐">⭐</option>
-              <option value="🔥">🔥</option>
-              <option value="✅">✅</option>
-              <option value="⚠️">⚠️</option>
-              <option value="💎">💎</option>
-              <option value="👀">👀</option>
-              <option value="🚩">🚩</option>
-              <option value="🚫">🚫</option>
-            </select>
-            <input type="text" id="hl-neutral-terms" class="text-input" placeholder="comma-separated terms" />
-            <button type="button" id="hl-neutral-reset" class="btn-mini" title="Clear neutral terms">×</button>
-          </div>
-
-          <label class="switch"><input type="checkbox" id="hl-neg-enabled" /><span class="switch__slider"></span><span class="switch__label">Negative (warning) — red</span></label>
-          <div class="row row--fill">
-            <select id="hl-neg-emoji" class="select--emoji" title="Badge emoji">
-              <option value="">—</option>
-              <option value="🚩">🚩</option>
-              <option value="🚫">🚫</option>
-              <option value="⚠️">⚠️</option>
-              <option value="🎲">🎲</option>
-              <option value="⭐">⭐</option>
-              <option value="🔥">🔥</option>
-              <option value="✅">✅</option>
-              <option value="💎">💎</option>
-              <option value="👀">👀</option>
-            </select>
-            <input type="text" id="hl-neg-terms" class="text-input" placeholder="warning keywords" />
-            <button type="button" id="hl-neg-reset" class="btn-mini" title="Clear negative terms">×</button>
-          </div>
-        </div>
-      </div>
+      <div class="col" id="col-1"></div>
+      <div class="col" id="col-2"></div>
     </div>
 
     <div class="footer">
       <button type="button" id="reset-defaults" class="btn-mini btn-reset" title="Restore all settings to defaults">Reset defaults</button>
-      <span class="version">v1.0.0-dev</span>
+      <span class="version" id="version"></span>
     </div>
 
     <!-- Registry + helpers first, then each feature's settings schema, then the
-         assembled defaults map — the same seams the content bundle uses (see
-         manifest.json); popup.js reads the results off globalThis.ES. -->
+         assembled defaults map, then each feature's popup component — the same
+         seams the content bundle uses (see manifest.json). popup.js reads the
+         results off globalThis.ES and names no feature itself. -->
     <script src="../src/core/registry.js"></script>
+    <script src="../src/core/popup-registry.js"></script>
+    <script src="../src/core/popup-dom.js"></script>
     <script src="../src/core/sanitize.js"></script>
     <script src="../src/notifications/sounds.js"></script>
-    <script src="../src/highlights/mystery.js"></script>
     <script src="../src/calculator/schema.js"></script>
-    <script src="../src/highlights/schema.js"></script>
-    <script src="../src/custom-view/schema.js"></script>
     <script src="../src/notifications/schema.js"></script>
     <script src="../src/core/defaults.js"></script>
+    <script src="../src/calculator/popup.js"></script>
+    <script src="../src/notifications/popup.js"></script>
     <script src="popup.js"></script>
   </body>
 </html>
