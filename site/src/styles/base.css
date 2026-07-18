@@ -1,0 +1,112 @@
+/* One fixed palette — the page owns its own background, so every visitor
+   sees the same calm, light surface regardless of their OS theme. */
+:root {
+  --purple: #4b2e83;
+  --purple-light: #eee8f4;
+  --orange: #b35a00;
+  --orange-light: #fff4e6;
+  --amber: #8a6100;
+  --amber-light: #fdf6e3;
+  --ebay-red: #e53238;
+  --ebay-blue: #0064d2;
+  --ebay-yellow: #f5af02;
+  --ebay-green: #86b817;
+
+  --bg-page: #dcdcdc;
+  --bg-card: #efefef;
+  --bg-elev: #f4f4f4;
+  --text: #1c1c1c;
+  --text-soft: #4a4a4a;
+  --text-faint: #6b6b6b;
+  --border: #c6c8d4;
+  --shadow: 0 2px 2px rgba(0, 0, 0, .04), 0 4px 12px rgba(0, 0, 0, .05);
+
+  --font-sans: "Atkinson Hyperlegible Next", "B612", "IBM Plex Sans", "Lexend", "Libertinus Sans", "Noto Sans", "Oxygen", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, sans-serif;
+  --font-serif: "Atkinson Hyperlegible Next", "B612", "IBM Plex Serif", "Libertinus Serif", "Noto Serif", Georgia, "Times New Roman", serif;
+  --font-mono: "Atkinson Hyperlegible Mono", "B612 Mono", "IBM Plex Mono", "Libertinus Mono", "Noto Sans Mono", "Nova Mono", "Oxygen Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-ebay: "Market Sans", "Helvetica Neue", Helvetica, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  background: var(--bg-page);
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background:
+    radial-gradient(1100px 520px at 50% -10%, color-mix(in srgb, var(--purple) 16%, transparent) 0%, transparent 62%),
+    var(--bg-page);
+  background-attachment: fixed;
+  color: var(--text);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--purple);
+  text-decoration: underline;
+  padding: 0px 2px;
+  border-radius: 6px;
+}
+
+a:hover {
+  text-decoration: underline;
+  background-color: var(--purple-light);
+}
+
+.brand-stripe {
+  height: 6px;
+  display: flex;
+}
+
+.brand-stripe span {
+  flex: 1;
+}
+
+.brand-stripe .r {
+  background: var(--ebay-red);
+}
+
+.brand-stripe .b {
+  background: var(--ebay-blue);
+}
+
+.brand-stripe .y {
+  background: var(--ebay-yellow);
+}
+
+.brand-stripe .g {
+  background: var(--ebay-green);
+}
+
+code {
+  font-family: var(--font-mono);
+  font-size: .88em;
+  background: color-mix(in srgb, var(--purple) 10%, transparent);
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
+/* ── Footer ── */
+footer {
+  text-align: center;
+  color: var(--text-faint);
+  font-size: .88rem;
+  border-top: 2px solid var(--border);
+  margin-top: 32px;
+}
+
+footer .sig {
+  color: var(--text-soft);
+}
+
+footer .copyright {
+  margin-top: 8px;
+  font-size: .8rem;
+}
