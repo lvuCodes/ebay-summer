@@ -30,7 +30,12 @@ function parseVersion(v) {
     });
 }
 
-const GROUP_LABELS = { added: "Added", fixed: "Fixed", changed: "Changed" };
+const GROUP_LABELS = {
+  added: "Added",
+  fixed: "Fixed",
+  changed: "Changed",
+  "known-issues": "Known Issues",
+};
 
 export function groupLabel(type) {
   return GROUP_LABELS[type] || String(type || "");

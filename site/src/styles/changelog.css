@@ -2,6 +2,7 @@
   --added: #2f7d32;
   --fixed: #b35a00;
   --changed: #0064d2;
+  --known-issues: #b3261e;
 }
 
 .wrap {
@@ -130,6 +131,14 @@ main {
 
 .tag-changed {
   background: var(--changed);
+}
+
+.tag-known-issues {
+  background: var(--known-issues);
+}
+
+.change-group.known-issues h3 {
+  color: var(--known-issues);
 }
 
 .change-group.added h3 {
