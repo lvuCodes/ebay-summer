@@ -10,8 +10,16 @@
   // Base is the compact card look (search cards, listing carousels, bids rows);
   // the --lg modifier bumps the main listing-page price box. eBay's own CSS is
   // high-specificity, so !important.
+  //
+  // Two palette custom properties carry every colour: --ink (borders, text,
+  // fills) and --surface (the box background + button-hover tint). Children read
+  // them by inheritance, so the amber variant is a two-line override of the pair
+  // rather than a duplicate of every coloured rule. Hover/divider tints are
+  // color-mixed from the same two so no third colour is ever hardcoded.
   const BOX_CSS = `
   .ebay-estimation {
+    --ink: #4b2e83 !important;
+    --surface: #eee8f4 !important;
     display: block !important;
     position: relative !important;
     width: auto !important;
@@ -20,10 +28,10 @@
     margin: 2px 0 3px !important;
     /* extra right room reserves space for the per-unit toggle button */
     padding: 3px 22px 3px 6px !important;
-    border: 1px dashed #6b3fa0 !important;
+    border: 1px dashed var(--ink) !important;
     border-radius: 6px !important;
-    background: #f3ecfb !important;
-    color: #4b2e83 !important;
+    background: var(--surface) !important;
+    color: var(--ink) !important;
     line-height: 1.2 !important;
   }
   /* Per-unit toggle button, pinned to the box's top-right corner. */
@@ -34,11 +42,11 @@
     width: 16px !important;
     height: 16px !important;
     padding: 0 !important;
-    margin: 0 !important;
-    border: 1px solid #6b3fa0 !important;
+    margin: 2px !important;
+    border: 1px solid var(--ink) !important;
     border-radius: 4px !important;
     background: #fff !important;
-    color: #4b2e83 !important;
+    color: var(--ink) !important;
     font-size: .78rem !important;
     line-height: 1 !important;
     cursor: pointer !important;
@@ -46,7 +54,7 @@
     align-items: center !important;
     justify-content: center !important;
   }
-  .ebay-estimation .ebay-estimation__toggle:hover { background: #ece0fb !important; }
+  .ebay-estimation .ebay-estimation__toggle:hover { background: color-mix(in srgb, var(--ink) 12%, var(--surface)) !important; }
   /* No per-unit toggle (listing-page non-main cards) — reclaim the reserved right
      padding that would have held the toggle button. */
   .ebay-estimation--no-toggle { padding-right: 6px !important; }
@@ -62,14 +70,14 @@
     gap: 3px !important;
     margin-top: 4px !important;
     padding-top: 4px !important;
-    border-top: 1px dashed #b79fd6 !important;
+    border-top: 1px dashed color-mix(in srgb, var(--ink) 35%, var(--surface)) !important;
   }
   .ebay-estimation .ebay-estimation__field-label {
     font-size: .68rem !important;
     font-weight: 700 !important;
     letter-spacing: .03em !important;
     text-transform: uppercase !important;
-    color: #6b3fa0 !important;
+    color: var(--ink) !important;
   }
   .ebay-estimation .ebay-estimation__stepper {
     display: inline-flex !important;
@@ -85,10 +93,10 @@
     height: 20px !important;
     padding: 0 !important;
     margin: 0 !important;
-    border: 1px solid #6b3fa0 !important;
+    border: 1px solid var(--ink) !important;
     border-radius: 4px !important;
     background: #fff !important;
-    color: #4b2e83 !important;
+    color: var(--ink) !important;
     font-size: .95rem !important;
     line-height: 1 !important;
     cursor: pointer !important;
@@ -96,7 +104,7 @@
     align-items: center !important;
     justify-content: center !important;
   }
-  .ebay-estimation .ebay-estimation__step:hover { background: #ece0fb !important; }
+  .ebay-estimation .ebay-estimation__step:hover { background: color-mix(in srgb, var(--ink) 12%, var(--surface)) !important; }
   .ebay-estimation .ebay-estimation__count {
     width: 3.4em !important;
     min-width: 0 !important;
@@ -104,49 +112,49 @@
     box-sizing: border-box !important;
     padding: 0 4px !important;
     margin: 0 !important;
-    border: 1px solid #6b3fa0 !important;
+    border: 1px solid var(--ink) !important;
     border-radius: 4px !important;
     background: #fff !important;
     line-height: 1 !important;
     text-align: center !important;
     font-size: .9rem !important;
     font-weight: 800 !important;
-    color: #4b2e83 !important;
+    color: var(--ink) !important;
     -moz-appearance: textfield !important;
     appearance: textfield !important;
   }
   .ebay-estimation .ebay-estimation__count:focus {
     outline: none !important;
-    border-color: #4b2e83 !important;
+    border-color: var(--ink) !important;
   }
   .ebay-estimation .ebay-estimation__perunit {
     margin-top: 2px !important;
     font-size: .8rem !important;
     font-weight: 700 !important;
-    color: #4b2e83 !important;
+    color: var(--ink) !important;
   }
   /* "Incl. shipping" per-unit basis toggle (moved here from the popup) — a <button>
      with a faux checkbox, so it can preventDefault the card link's navigation. */
   .ebay-estimation .ebay-estimation__ship {
     display: inline-flex !important;
     align-items: center !important;
-    gap: 5px !important;
+    gap: 6px !important;
     margin-top: 4px !important;
     padding: 0 !important;
     border: none !important;
     background: none !important;
     font-size: .7rem !important;
     font-weight: 700 !important;
-    color: #6b3fa0 !important;
+    color: var(--ink) !important;
     cursor: pointer !important;
   }
   .ebay-estimation .ebay-estimation__ship-box {
     flex: 0 0 auto !important;
-    width: 13px !important;
-    height: 13px !important;
+    width: 12px !important;
+    height: 12px !important;
     box-sizing: border-box !important;
-    border: 1.5px solid #6b3fa0 !important;
-    border-radius: 3px !important;
+    border: 2px solid var(--ink) !important;
+    border-radius: 4px !important;
     background: #fff !important;
     display: inline-flex !important;
     align-items: center !important;
@@ -156,7 +164,7 @@
     color: #fff !important;
   }
   .ebay-estimation .ebay-estimation__ship[aria-pressed="true"] .ebay-estimation__ship-box {
-    background: #6b3fa0 !important;
+    background: var(--ink) !important;
   }
   .ebay-estimation .ebay-estimation__ship[aria-pressed="true"] .ebay-estimation__ship-box::after {
     content: "✓" !important;
@@ -167,18 +175,18 @@
   .ebay-estimation .ebay-estimation__label {
     display: block !important;
     font-size: .62rem !important;
-    line-height: 1.15 !important;
+    line-height: 1.2 !important;
     font-weight: 700 !important;
     letter-spacing: .04em !important;
     text-transform: uppercase !important;
-    color: #6b3fa0 !important;
+    color: var(--ink) !important;
   }
   .ebay-estimation .ebay-estimation__amount {
     display: block !important;
     font-size: 1.1rem !important;
-    line-height: 1.15 !important;
+    line-height: 1.2 !important;
     font-weight: 800 !important;
-    color: #4b2e83 !important;
+    color: var(--ink) !important;
   }
   /* Emoji carry taller intrinsic metrics than text; pin line-height so a dot/
      range flag can't stretch the amount line past a text-only box's height. */
@@ -191,8 +199,8 @@
     display: block !important;
     font-weight: 400 !important;
     font-size: .74rem !important;
-    line-height: 1.15 !important;
-    color: #6b3fa0 !important;
+    line-height: 1.2 !important;
+    color: var(--ink) !important;
   }
   /* The main listing box breathes a touch more than the compact cards. */
   .ebay-estimation--lg .ebay-estimation__label,
@@ -255,7 +263,7 @@
     border-top: none !important;
     margin-left: 12px !important;
     padding-left: 12px !important;
-    border-left: 1px dashed #b79fd6 !important;
+    border-left: 1px dashed color-mix(in srgb, var(--ink) 35%, var(--surface)) !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: flex-start !important;
@@ -324,40 +332,14 @@
 
   /* --- Amber variant — home page (item + tax only) ----------------------- */
   /* The home feed exposes no per-card shipping, so its box shows item + tax
-     only. A deep amber/gold palette marks it as distinct from the purple full-
-     landed-total box and reads as informational (neither positive nor negative).
-     Overrides colors only; the layout is the shared compact box. */
+     only. A gold palette marks it as distinct from the purple full-landed-total
+     box and reads as informational (neither positive nor negative). Every
+     coloured rule above already reads --ink / --surface, so swapping just the
+     two custom properties re-skins the whole variant. */
   .ebay-estimation--amber {
-    border-color: #b8860b !important;
-    background: #fdf6e3 !important;
-    color: #7a5c00 !important;
+    --ink: #8a6100 !important;
+    --surface: #fdf6e3 !important;
   }
-  .ebay-estimation--amber .ebay-estimation__toggle {
-    border-color: #b8860b !important;
-    color: #7a5c00 !important;
-  }
-  .ebay-estimation--amber .ebay-estimation__toggle:hover { background: #f7ecc9 !important; }
-  .ebay-estimation--amber .ebay-estimation__panel { border-color: #e3cd8f !important; }
-  .ebay-estimation--amber .ebay-estimation__field-label { color: #8a6100 !important; }
-  .ebay-estimation--amber .ebay-estimation__step {
-    border-color: #b8860b !important;
-    color: #7a5c00 !important;
-  }
-  .ebay-estimation--amber .ebay-estimation__step:hover { background: #f7ecc9 !important; }
-  .ebay-estimation--amber .ebay-estimation__count {
-    border-color: #b8860b !important;
-    color: #7a5c00 !important;
-  }
-  .ebay-estimation--amber .ebay-estimation__count:focus { border-color: #7a5c00 !important; }
-  .ebay-estimation--amber .ebay-estimation__perunit { color: #7a5c00 !important; }
-  .ebay-estimation--amber .ebay-estimation__ship { color: #8a6100 !important; }
-  .ebay-estimation--amber .ebay-estimation__ship-box { border-color: #8a6100 !important; }
-  .ebay-estimation--amber .ebay-estimation__ship[aria-pressed="true"] .ebay-estimation__ship-box {
-    background: #8a6100 !important;
-  }
-  .ebay-estimation--amber .ebay-estimation__label { color: #8a6100 !important; }
-  .ebay-estimation--amber .ebay-estimation__amount { color: #7a5c00 !important; }
-  .ebay-estimation--amber .ebay-estimation__sub { color: #8a6100 !important; }
 `;
 
   Object.assign(ES, { BOX_CSS });

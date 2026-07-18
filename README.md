@@ -1,14 +1,14 @@
 # eBay Σummer
 
-**Version 1.1.0**
+**Version 1.1.1**
 
 A Manifest V3 Chrome extension that shows the approximate total cost — **item price + sales tax + shipping** — as a dashed-purple "Est. total" box on eBay pages, so you can compare landed cost across listings at a glance. It ships two features: the **Estimated Total Calculator** and **Auction Ending Notifications**.
 
 ## Install
 
-1. Open `chrome://extensions`.
-2. Enable **Developer mode** (top right).
-3. **Load unpacked** → select the `release-v1/` folder.
+1. Download [`releases/v1.1.1.zip`](releases/v1.1.1.zip) and unzip it.
+2. Open `chrome://extensions` and enable **Developer mode** (top right).
+3. **Load unpacked** → select the unzipped `v1.1.1/` folder.
 4. Visit an eBay listing, search, or bids/offers page — the boxes appear automatically.
 
 ## Coverage
@@ -51,5 +51,5 @@ chrome.storage.sync.set({ taxRate: 0.10, shipFloor: 8, shipPct: 0.4 }); // recom
 
 ## Details
 
-Full behaviour, the complete settings-key reference, and implementation notes live in [specs/](specs/).
+Full behaviour, the complete settings-key reference, and implementation notes live in [specs/](specs/). Release history is in [CHANGELOG.md](CHANGELOG.md).
 

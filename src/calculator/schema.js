@@ -3,7 +3,14 @@
 (function () {
   "use strict";
   const ES = (globalThis.ES = globalThis.ES || {});
-  const { sanitizeNonNeg, sanitizeTaxRate } = ES;
+  const { sanitizeNonNeg } = ES;
+
+  // The tax rate with its 8.25% default. Lives next to the taxRate key it guards;
+  // exposed on ES for the popup's shared sanitize path and the settings tests.
+  function sanitizeTaxRate(v) {
+    return sanitizeNonNeg(v, 0.0825);
+  }
+  ES.sanitizeTaxRate = sanitizeTaxRate;
 
   const defaults = {
     // Section master: the estimation boxes + bid calculator. On by default —
