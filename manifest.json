@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "eBay Σummer",
-  "version": "1.1.1",
+  "version": "1.1.0",
   "description": "Shows the approx. total cost (item + item only sales tax + shipping) on eBay listing, search, and bids/offers pages.",
   "permissions": [
     "storage",

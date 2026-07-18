@@ -2,21 +2,6 @@
 
 All notable changes to eBay Σummer. Versions follow the extension's `manifest.json` version, and each release is packaged as a zip under [releases/](releases/).
 
-## [1.1.1] — unreleased
-
-Cosmetic and organizational release — visual polish and internal cleanup only, with no change to how the calculator, tax, shipping, or alerts behave.
-
-Not shipped. The first packaged build was withdrawn before release: its `popup.html` loaded three scripts belonging to the unreleased Custom View and Listing Highlights features, which the package deliberately excludes, so the popup threw on open. The popup is being split into per-feature components so a package can omit a feature's UI along the same seam it already omits that feature's source; 1.1.1 will be cut once that lands.
-
-### Changed
-
-- **Purple-logo extension icons.** The 16 / 48 / 128 px action icons are regenerated from the purple logo so the toolbar button and `chrome://extensions` card match the rest of the brand.
-- **Estimation box and widget polish.** The estimated-total box and bid-calculator widgets are restyled, and the home page gains an amber tooltip.
-- **Internal cleanup, no behavior change.** Per-feature value sanitizers move next to the settings they guard, a shared tax-rate percent formatter is factored out, and GPL license headers are added — refactors that leave the extension's behavior identical.
-- Release packages are renamed to drop the `release-` prefix: `v1.0.0.zip`, `v1.1.0.zip`.
-
-Package: not yet published.
-
 ## [1.1.0] — 2026-07-13
 
 Fixes the bid calculator's injection into eBay's redesigned Best-Offer "Make offer" lightbox.

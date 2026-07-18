@@ -7,10 +7,8 @@ export function listReleases(data) {
   return releases.slice().sort((a, b) => cmpVersion(b.version, a.version));
 }
 
-// The newest entry that has actually shipped — an unreleased entry sits at the
-// top of the list but is not what users can install.
 export function latestRelease(data) {
-  return listReleases(data).find((r) => !r.unreleased) || null;
+  return listReleases(data)[0] || null;
 }
 
 export function cmpVersion(a, b) {
@@ -45,11 +43,8 @@ export function validateReleases(data) {
   if (releases.length === 0) throw new Error("releases.json has no releases");
   for (const r of releases) {
     if (!r.version) throw new Error("release missing version");
-    // An unreleased entry has no ship date yet; every other entry must carry one.
-    if (!r.unreleased && !/^\d{4}-\d{2}-\d{2}$/.test(String(r.date || "")))
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(String(r.date || "")))
       throw new Error(`release ${r.version} has an invalid date`);
-    if (r.unreleased && r.date)
-      throw new Error(`release ${r.version} is unreleased but carries a date`);
     for (const g of r.groups || []) {
       if (!GROUP_LABELS[g.type])
         throw new Error(`release ${r.version} has unknown group type "${g.type}"`);
