@@ -25,8 +25,26 @@ test("listReleases returns newest first", () => {
   assert.equal(versions[0], "1.1.1");
 });
 
-test("latestRelease is the highest version", () => {
-  assert.equal(latestRelease(data).version, "1.1.1");
+test("latestRelease is the highest shipped version, skipping unreleased entries", () => {
+  assert.equal(latestRelease(data).version, "1.1.0");
+  assert.equal(
+    latestRelease({
+      releases: [
+        { version: "2.0.0", unreleased: true },
+        { version: "1.9.0", date: "2026-01-01" },
+      ],
+    }).version,
+    "1.9.0",
+  );
+  assert.equal(latestRelease({ releases: [{ version: "2.0.0", unreleased: true }] }), null);
+});
+
+test("an unreleased entry validates without a date, but not with one", () => {
+  assert.equal(validateReleases({ releases: [{ version: "2.0.0", unreleased: true }] }), true);
+  assert.throws(
+    () => validateReleases({ releases: [{ version: "2.0.0", unreleased: true, date: "2026-01-01" }] }),
+    /unreleased but carries a date/,
+  );
 });
 
 test("groupLabel maps known types and passes through unknowns", () => {
