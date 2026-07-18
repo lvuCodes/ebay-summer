@@ -15,7 +15,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "24"
-      # The extension has no dependencies; the coverage floors (78/92/75) fail the job when breached.
+      # The extension has no dependencies; the coverage floors in package.json fail the job when breached.
       - run: npm run test:coverage
 
   site-build:
@@ -32,5 +32,6 @@ jobs:
           cache: npm
           cache-dependency-path: site/package-lock.json
       - run: npm ci
-      - run: npm test
+      # Gates the site's own coverage floors, declared in site/package.json.
+      - run: npm run test:coverage
       - run: npm run build
