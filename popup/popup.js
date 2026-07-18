@@ -1,104 +1,46 @@
 // eBay Σummer. Copyright (C) 2026 lvuCodes. Licensed under GPL-3.0-or-later; see LICENSE.md.
 //
-// Popup controller. The registry + helper modules and each feature's schema.js
-// load first in popup.html and attach their API to globalThis.ES, which this file
-// reads (sanitizers, playSound, DEFAULTS). The popup edits the stored
-// settings; content.js listens on chrome.storage.onChanged and re-renders, so
-// saving here updates open eBay tabs live — the popup does no messaging of its own.
+// Popup shell. The registry + helper modules and each feature's schema.js and
+// popup.js load first in popup.html and attach their API to globalThis.ES, which
+// this file reads (sanitizers, DEFAULTS, the registered sections). The popup
+// edits the stored settings; content.js listens on chrome.storage.onChanged and
+// re-renders, so saving here updates open eBay tabs live — the popup does no
+// messaging of its own.
 //
-// Numeric FIELDS store decimals for the rates (taxRate 0.0825, shipPct 0.5) and
+// This file names no feature. It mounts whatever sections registered, walks the
+// controls they contributed, and owns only the chrome that belongs to no feature:
+// the master enable, the reload button, and reset-to-defaults. A build that omits
+// a feature's <script> lines gets a popup without that section and nothing else
+// changes — which is the property the v1.1.1 package violated.
+//
+// Numeric fields store decimals for the rates (taxRate 0.0825, shipPct 0.5) and
 // a dollar amount for the floor (shipFloor 10); rate fields display as percents.
-// Boolean CHECKS store true/false page-layout toggles.
-
 (function () {
   "use strict";
 
-  // The core modules (loaded first in popup.html) expose these on globalThis.ES.
-  // DEFAULTS is the shared default map (defaults.js) — the single source of truth
-  // every control's `def` is read from below, so nothing here restates a value.
-  const { sanitizeNonNeg, sanitizeBool, sanitizeSound, sanitizeEmoji, playSound, DEFAULTS } =
-    globalThis.ES;
+  const { sanitizeNonNeg, sanitizeBool, sectionEl, DEFAULTS } = globalThis.ES;
 
-  const FIELDS = [
-    { id: "tax", key: "taxRate", pct: true },
-    { id: "ship-floor", key: "shipFloor", pct: false },
-    { id: "ship-pct", key: "shipPct", pct: true },
-    { id: "notify-1", key: "notifyAt1", pct: false },
-    { id: "notify-2", key: "notifyAt2", pct: false },
-  ];
+  // --- mount every registered section --------------------------------------
+  // Registration order is <script> order, which fixes the order sections appear
+  // within their column.
+  globalThis.ES.popupSections.forEach((s) => {
+    const col = document.getElementById(`col-${s.column}`);
+    const { header, body } = sectionEl(s.id, s.title, s.master, s.masterTitle);
+    col.appendChild(header);
+    col.appendChild(body);
+    s.render(body);
+  });
 
-  const CHECKS = [
-    { id: "enabled", key: "enabled" },
-    // Section-header masters (each toggles a whole feature on/off).
-    { id: "sec-esttotal", key: "estTotal" },
-    { id: "flag-shipping", key: "flagShipping" },
-    { id: "sec-auction", key: "notifyEnabled" },
-    { id: "sec-highlight", key: "highlightEnabled" },
-    { id: "hl-neg-enabled", key: "flagNegative" },
-    { id: "hl-pos-enabled", key: "flagPositive" },
-    { id: "hl-neutral-enabled", key: "flagNeutral" },
-    { id: "sec-customview", key: "customView" },
-    { id: "show-live", key: "showLive" },
-    { id: "show-sponsored-stores", key: "showSponsoredStores" },
-    { id: "flag-range", key: "flagRange" },
-    { id: "page-listing", key: "pageListing" },
-    { id: "page-search", key: "pageSearch" },
-    { id: "page-watchlist", key: "pageWatchlist" },
-    { id: "page-bids", key: "pageBidsOffers" },
-    { id: "page-home", key: "pageHome" },
-    { id: "page-summary", key: "pageSummary" },
-    { id: "page-rvi", key: "pageRecentView" },
-    { id: "page-saved", key: "pageSaved" },
-    { id: "show-checkbox", key: "showCheckbox" },
-    { id: "show-buttons", key: "showButtons" },
-    { id: "show-offers-checkbox", key: "showOffersCheckbox" },
-    { id: "show-offers-buttons", key: "showOffersButtons" },
-    { id: "show-didntwin-checkbox", key: "showDidntwinCheckbox" },
-    { id: "show-didntwin-buttons", key: "showDidntwinButtons" },
-    { id: "show-bids", key: "showBids" },
-    { id: "show-offers", key: "showOffers" },
-    { id: "show-didntwin", key: "showDidntWin" },
-    { id: "infinite-scroll", key: "infiniteScroll" },
-    { id: "full-width", key: "fullWidth" },
-    { id: "notify-sound-enabled", key: "notifySoundEnabled" },
-    { id: "notify-1-enabled", key: "notifyEnabled1" },
-    { id: "notify-2-enabled", key: "notifyEnabled2" },
-    { id: "notify-ended-persist", key: "notifyEndedPersist" },
-  ];
-
-  // <select> settings. Each carries its own sanitizer (the sound key validates
-  // against SOUNDS; the highlight badge emojis validate against the preset set).
-  const SELECTS = [
-    { id: "notify-sound", key: "notifySound", san: (v) => sanitizeSound(v) },
-    { id: "hl-neg-emoji", key: "flagNegativeEmoji", san: sanitizeEmoji },
-    { id: "hl-pos-emoji", key: "flagPositiveEmoji", san: sanitizeEmoji },
-    { id: "hl-neutral-emoji", key: "flagNeutralEmoji", san: sanitizeEmoji },
-  ];
-
-  // Free-text settings (stored verbatim). The neutral highlight terms seed from
-  // the shared built-in default so the box starts pre-filled; positive starts
-  // empty (the user supplies their own desired keywords). Both fully editable.
-  const TEXTS = [
-    { id: "hl-neg-terms", key: "flagNegativeTerms" },
-    { id: "hl-pos-terms", key: "flagPositiveTerms" },
-    { id: "hl-neutral-terms", key: "flagNeutralTerms" },
-  ];
-
-  // Radio groups (one stored string, restricted to `values`).
-  const RADIOS = [
-    { name: "goldin", key: "goldin", values: ["show", "hide", "flag"] },
-    { name: "filter-mode", key: "filterMode", values: ["show", "hide", "collapsible"] },
-    { name: "filter-expand", key: "filterExpandOn", values: ["hover", "click"] },
-  ];
-
-  // Collapsible subsections, each persisted by its own bool (popup-only UI
-  // state): the per-section "Columns" disclosures. Toggling hides/shows the body
-  // to save space. One per section, independent.
-  const COLLAPSES = [
-    { toggle: "bids-cols-toggle", body: "bids-cols-body", key: "bidsColsCollapsed" },
-    { toggle: "offers-cols-toggle", body: "offers-cols-body", key: "offersColsCollapsed" },
-    { toggle: "didntwin-cols-toggle", body: "didntwin-cols-body", key: "didntwinColsCollapsed" },
-  ];
+  // --- the control tables, assembled from the mounted sections --------------
+  const FIELDS = globalThis.ES.collectPopupControls("fields");
+  const CHECKS = [{ id: "enabled", key: "enabled" }].concat(
+    globalThis.ES.collectPopupControls("checks")
+  );
+  const SELECTS = globalThis.ES.collectPopupControls("selects");
+  const TEXTS = globalThis.ES.collectPopupControls("texts");
+  const RADIOS = globalThis.ES.collectPopupControls("radios");
+  const COLLAPSES = globalThis.ES.collectPopupControls("collapses");
+  const TOGGLES = globalThis.ES.collectPopupToggles();
 
   // Stamp each control's default from the shared map, keyed by its storage key —
   // the values live in defaults.js, not here.
@@ -109,6 +51,10 @@
   // "Reset defaults" writes the full shared map (a copy so no caller mutates it),
   // covering every persisted key — including ones without a popup control.
   const defaults = { ...DEFAULTS };
+
+  // Hooks a section asked to run after each load(), for state derived from the
+  // controls the generic loop fills.
+  const onLoadedHooks = [];
 
   // Stored value -> number shown in a numeric field (percent for rate fields).
   function toField(f, stored) {
@@ -146,41 +92,17 @@
         if (el) el.checked = true;
       });
       updateSections();
-      updateFilterExpand();
       COLLAPSES.forEach((c) => applyCollapse(c, sanitizeBool(stored[c.key], c.def)));
-      syncAllPages();
+      onLoadedHooks.forEach((fn) => fn());
     });
   }
 
-  // Each section-header toggle reveals/hides its section's body when off; the
-  // Estimated Total Calculator toggle also hides the whole "Show Est. Total On…"
-  // section (its per-page toggles are moot when the feature is off). Each
-  // section's column sub-toggles only show when that section's toggle is on.
-  const SECTION_TOGGLES = [
-    { control: "sec-esttotal", sections: ["body-esttotal", "header-showtotal", "body-showtotal"] },
-    // The shipping-flag sub-toggle collapses its threshold rows when off.
-    { control: "flag-shipping", sections: ["body-shipflag"] },
-    { control: "sec-auction", sections: ["body-auction"] },
-    { control: "sec-highlight", sections: ["body-highlight"] },
-    { control: "sec-customview", sections: ["body-customview"] },
-    // Each section's "Additional options" disclosure button lives inline in the
-    // section-toggle row (not inside its *-columns body wrapper), so hide the
-    // button alongside its body when the section is off.
-    { control: "show-bids", sections: ["bids-columns", "bids-cols-toggle"] },
-    { control: "show-offers", sections: ["offers-columns", "offers-cols-toggle"] },
-    { control: "show-didntwin", sections: ["didntwin-columns", "didntwin-cols-toggle"] },
-  ];
+  // Each toggle reveals/hides the section ids its feature declared.
   function updateSections() {
-    SECTION_TOGGLES.forEach((s) => {
-      const on = document.getElementById(s.control).checked;
-      s.sections.forEach((id) => (document.getElementById(id).hidden = !on));
+    TOGGLES.forEach((t) => {
+      const on = document.getElementById(t.control).checked;
+      t.sections.forEach((id) => (document.getElementById(id).hidden = !on));
     });
-  }
-
-  // The "Expand on" (hover/click) row only applies when Filters is Collapsible.
-  function updateFilterExpand() {
-    const mode = document.querySelector('input[name="filter-mode"]:checked');
-    document.getElementById("filter-expand-row").hidden = !(mode && mode.value === "collapsible");
   }
 
   // Persist all controls. Live, so eBay tabs update as you edit.
@@ -197,77 +119,30 @@
     chrome.storage.sync.set(out);
   }
 
-  FIELDS.forEach((f) => {
-    const el = document.getElementById(f.id);
-    el.addEventListener("input", save);
-    el.addEventListener("change", load);
-  });
-  CHECKS.forEach((c) => {
-    document.getElementById(c.id).addEventListener("change", save);
-  });
-  SECTION_TOGGLES.forEach((s) => {
-    document.getElementById(s.control).addEventListener("change", updateSections);
-  });
-  SELECTS.forEach((s) => {
-    document.getElementById(s.id).addEventListener("change", save);
-  });
-  TEXTS.forEach((t) => {
-    document.getElementById(t.id).addEventListener("input", save);
-  });
-  RADIOS.forEach((r) => {
-    document.querySelectorAll(`input[name="${r.name}"]`).forEach((el) => {
-      el.addEventListener("change", save);
-    });
-  });
-  // Reveal/hide the "Expand on" row as the Filters mode changes.
-  document.querySelectorAll('input[name="filter-mode"]').forEach((el) => {
-    el.addEventListener("change", updateFilterExpand);
-  });
-
-  // Clear a highlight term box (× button). Both polarities empty their box; the
-  // built-in neutral keywords still seed the box on first run and are recoverable
-  // via the footer "Reset defaults".
-  document.getElementById("hl-neg-reset").addEventListener("click", function () {
-    document.getElementById("hl-neg-terms").value = "";
-    save();
-  });
-  document.getElementById("hl-pos-reset").addEventListener("click", function () {
-    document.getElementById("hl-pos-terms").value = "";
-    save();
-  });
-  document.getElementById("hl-neutral-reset").addEventListener("click", function () {
-    document.getElementById("hl-neutral-terms").value = "";
-    save();
-  });
-
-  // --- "Show Est. Total On…" master select-all ------------------------------
-  // The header toggle is a pure select-all/none over the eight page checks (not a
-  // stored setting): checking it turns them all on, unchecking turns them all off,
-  // and it reflects their state (indeterminate when only some are on).
-  const pageBoxes = () =>
-    CHECKS.filter((c) => c.key.startsWith("page")).map((c) => document.getElementById(c.id));
-  function syncAllPages() {
-    const boxes = pageBoxes();
-    const on = boxes.filter((b) => b.checked).length;
-    const all = document.getElementById("page-all");
-    all.checked = on === boxes.length;
-    all.indeterminate = on > 0 && on < boxes.length;
-  }
-  document.getElementById("page-all").addEventListener("change", function () {
-    const checked = this.checked;
-    pageBoxes().forEach((b) => (b.checked = checked));
-    this.indeterminate = false;
-    save();
-  });
-  pageBoxes().forEach((b) => b.addEventListener("change", syncAllPages));
-
-  // --- Collapsible per-section "Columns" subsections ------------------------
   function applyCollapse(c, collapsed) {
     document.getElementById(c.body).hidden = collapsed;
     const btn = document.getElementById(c.toggle);
     btn.setAttribute("aria-expanded", String(!collapsed));
     btn.querySelector(".subhead__caret").textContent = collapsed ? "▸" : "▾";
   }
+
+  // --- generic wiring over the assembled tables -----------------------------
+  FIELDS.forEach((f) => {
+    const el = document.getElementById(f.id);
+    el.addEventListener("input", save);
+    el.addEventListener("change", load);
+  });
+  CHECKS.forEach((c) => document.getElementById(c.id).addEventListener("change", save));
+  SELECTS.forEach((s) => document.getElementById(s.id).addEventListener("change", save));
+  TEXTS.forEach((t) => document.getElementById(t.id).addEventListener("input", save));
+  RADIOS.forEach((r) => {
+    document.querySelectorAll(`input[name="${r.name}"]`).forEach((el) => {
+      el.addEventListener("change", save);
+    });
+  });
+  TOGGLES.forEach((t) => {
+    document.getElementById(t.control).addEventListener("change", updateSections);
+  });
   COLLAPSES.forEach((c) => {
     document.getElementById(c.toggle).addEventListener("click", function () {
       // Currently expanded (body visible) -> collapse it, and vice versa.
@@ -277,9 +152,19 @@
     });
   });
 
-  // --- Reset all settings to defaults (two-click confirm) -------------------
-  // First click arms + warns; a second click writes the full defaults object and
-  // repaints. Any blur (clicking elsewhere) disarms it, so a stray click is safe.
+  // --- per-section wiring the generic loop cannot express -------------------
+  globalThis.ES.popupSections.forEach((s) => {
+    if (s.init) s.init({ save, load, onLoaded: (fn) => onLoadedHooks.push(fn) });
+  });
+
+  // --- shell chrome, owned by no feature ------------------------------------
+  // Stamp the running version so the footer cannot drift from the manifest.
+  document.getElementById("version").textContent =
+    "v" + chrome.runtime.getManifest().version;
+
+  // Reset all settings to defaults (two-click confirm). First click arms + warns;
+  // a second writes the full defaults object and repaints. Any blur disarms it,
+  // so a stray click is safe.
   const resetBtn = document.getElementById("reset-defaults");
   let resetArmed = false;
   function disarmReset() {
@@ -300,17 +185,6 @@
     });
   });
   resetBtn.addEventListener("blur", disarmReset);
-
-  // Preview the selected alert sound on demand. The popup owns its own
-  // AudioContext (a click is a user gesture, so it can play immediately).
-  let previewCtx = null;
-  document.getElementById("notify-preview").addEventListener("click", function () {
-    try {
-      if (!previewCtx) previewCtx = new (window.AudioContext || window.webkitAudioContext)();
-      if (previewCtx.state === "suspended") previewCtx.resume();
-      playSound(previewCtx, document.getElementById("notify-sound").value);
-    } catch (e) {}
-  });
 
   // Reload every open eBay tab. tabs.reload needs no permission, and the URL
   // filter works with the eBay host access the content-script match already
