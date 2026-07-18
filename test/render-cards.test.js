@@ -23,40 +23,56 @@ const ES = require("./load-es.js");
 // .su-item-card__header as the insert anchor.
 function oldCard(price, shipText) {
   const kids = [
-    el("div", { class: "su-item-card__header", children: [
-      el("div", { class: "su-item-card__title", text: "A thing" }),
-    ] }),
-    el("div", { class: "su-item-card__price-container", children: [
-      el("span", { class: "su-item-card__price", text: price }),
-    ] }),
+    el("div", {
+      class: "su-item-card__header", children: [
+        el("div", { class: "su-item-card__title", text: "A thing" }),
+      ]
+    }),
+    el("div", {
+      class: "su-item-card__price-container", children: [
+        el("span", { class: "su-item-card__price", text: price }),
+      ]
+    }),
   ];
   if (shipText) kids.push(el("div", { children: [el("span", { text: shipText })] }));
-  return el("li", { class: "su-item-card", children: [
-    el("div", { class: "su-card-container__content", children: kids }),
-  ] });
+  return el("li", {
+    class: "su-item-card", children: [
+      el("div", { class: "su-card-container__content", children: kids }),
+    ]
+  });
 }
 
 // A card in the current markup: price in an attribute row, header supplied only
 // by the shared .su-card-container__header wrapper.
 function newCard(price, shipText) {
   const rows = [
-    el("div", { class: "s-card__attribute-row", children: [
-      el("span", { class: "s-card__price", text: price }),
-    ] }),
+    el("div", {
+      class: "s-card__attribute-row", children: [
+        el("span", { class: "s-card__price", text: price }),
+      ]
+    }),
   ];
   if (shipText) {
-    rows.push(el("div", { class: "s-card__attribute-row", children: [
-      el("span", { text: shipText }),
-    ] }));
+    rows.push(el("div", {
+      class: "s-card__attribute-row", children: [
+        el("span", { text: shipText }),
+      ]
+    }));
   }
-  return el("li", { class: "s-card s-card--vertical", children: [
-    el("div", { class: "su-card-container__content", children: [
-      el("div", { class: "su-card-container__header", children: [
-        el("div", { class: "s-card__title", text: "A thing" }),
-      ] }),
-      el("div", { class: "su-card-container__attributes", children: rows }),
-    ] }),
-  ] });
+  return el("li", {
+    class: "s-card s-card--vertical", children: [
+      el("div", {
+        class: "su-card-container__content", children: [
+          el("div", {
+            class: "su-card-container__header", children: [
+              el("div", { class: "s-card__title", text: "A thing" }),
+            ]
+          }),
+          el("div", { class: "su-card-container__attributes", children: rows }),
+        ]
+      }),
+    ]
+  });
 }
 
 function pageOf(cards) {
@@ -112,16 +128,24 @@ test("insertCardBox lands the box in each markup's own header", () => {
 // container header would win over the inner one on an old card carrying both —
 // silently moving the box relative to where v1.1.0 put it.
 test("insertCardBox prefers the inner header when a card carries both", () => {
-  const card = el("li", { class: "su-item-card", children: [
-    el("div", { class: "su-card-container__header", children: [
-      el("div", { class: "su-item-card__header", children: [
-        el("div", { class: "su-item-card__title", text: "A thing" }),
-      ] }),
-      el("div", { class: "su-item-card__price-container", children: [
-        el("span", { class: "su-item-card__price", text: "$20.00" }),
-      ] }),
-    ] }),
-  ] });
+  const card = el("li", {
+    class: "su-item-card", children: [
+      el("div", {
+        class: "su-card-container__header", children: [
+          el("div", {
+            class: "su-item-card__header", children: [
+              el("div", { class: "su-item-card__title", text: "A thing" }),
+            ]
+          }),
+          el("div", {
+            class: "su-item-card__price-container", children: [
+              el("span", { class: "su-item-card__price", text: "$20.00" }),
+            ]
+          }),
+        ]
+      }),
+    ]
+  });
   pageOf([card]);
   const box = el("div", { attrs: { "data-ebay-total": "" } });
   ES.insertCardBox(card, card.querySelector(ES.CARD_PRICE_SEL), box);
@@ -131,11 +155,15 @@ test("insertCardBox prefers the inner header when a card carries both", () => {
 // Every anchor missing — the shape a further reskin would take. The box must
 // still land somewhere inside the card rather than being dropped.
 test("insertCardBox falls back into the card when no anchor is recognised", () => {
-  const card = el("li", { class: "s-card", children: [
-    el("div", { class: "su-card-container__content", children: [
-      el("span", { class: "s-card__price", text: "$20.00" }),
-    ] }),
-  ] });
+  const card = el("li", {
+    class: "s-card", children: [
+      el("div", {
+        class: "su-card-container__content", children: [
+          el("span", { class: "s-card__price", text: "$20.00" }),
+        ]
+      }),
+    ]
+  });
   pageOf([card]);
   const box = el("div", { attrs: { "data-ebay-total": "" } });
   ES.insertCardBox(card, card.querySelector(ES.CARD_PRICE_SEL), box);
@@ -147,19 +175,27 @@ test("insertCardBox falls back into the card when no anchor is recognised", () =
 // across three sibling .s-card__price spans in ONE attribute row, so reading a
 // single element drops the high end and understates the estimate.
 function rangeCard(low, high) {
-  return el("li", { class: "s-card", children: [
-    el("div", { class: "su-card-container__content", children: [
-      el("div", { class: "su-card-container__header" }),
-      el("div", { class: "s-card__attribute-row", children: [
-        el("span", { class: "su-styled-text primary bold large-1 s-card__price", text: low }),
-        el("span", { class: "su-styled-text primary bold default s-card__price", text: " to " }),
-        el("span", { class: "su-styled-text primary bold large-1 s-card__price", text: high }),
-      ] }),
-      el("div", { class: "s-card__attribute-row", children: [
-        el("span", { class: "su-styled-text secondary large", text: "Buy It Now" }),
-      ] }),
-    ] }),
-  ] });
+  return el("li", {
+    class: "s-card", children: [
+      el("div", {
+        class: "su-card-container__content", children: [
+          el("div", { class: "su-card-container__header" }),
+          el("div", {
+            class: "s-card__attribute-row", children: [
+              el("span", { class: "su-styled-text primary bold large-1 s-card__price", text: low }),
+              el("span", { class: "su-styled-text primary bold default s-card__price", text: " to " }),
+              el("span", { class: "su-styled-text primary bold large-1 s-card__price", text: high }),
+            ]
+          }),
+          el("div", {
+            class: "s-card__attribute-row", children: [
+              el("span", { class: "su-styled-text secondary large", text: "Buy It Now" }),
+            ]
+          }),
+        ]
+      }),
+    ]
+  });
 }
 
 test("a split range reads both ends, not just the low span", () => {
@@ -180,19 +216,29 @@ test("a single-price card is unaffected by the range join", () => {
 // An auction+BIN card carries two unrelated prices in SEPARATE rows. Joining
 // across the whole card would invent a range spanning two different offers.
 test("a second price in another row is not folded into the range", () => {
-  const card = el("li", { class: "s-card", children: [
-    el("div", { class: "su-card-container__content", children: [
-      el("div", { class: "s-card__attribute-row", children: [
-        el("span", { class: "s-card__price", text: "$10.00" }),
-      ] }),
-      el("div", { class: "s-card__attribute-row", children: [
-        el("span", { text: "0 bids" }),
-      ] }),
-      el("div", { class: "s-card__attribute-row", children: [
-        el("span", { class: "s-card__price", text: "$13.00" }),
-      ] }),
-    ] }),
-  ] });
+  const card = el("li", {
+    class: "s-card", children: [
+      el("div", {
+        class: "su-card-container__content", children: [
+          el("div", {
+            class: "s-card__attribute-row", children: [
+              el("span", { class: "s-card__price", text: "$10.00" }),
+            ]
+          }),
+          el("div", {
+            class: "s-card__attribute-row", children: [
+              el("span", { text: "0 bids" }),
+            ]
+          }),
+          el("div", {
+            class: "s-card__attribute-row", children: [
+              el("span", { class: "s-card__price", text: "$13.00" }),
+            ]
+          }),
+        ]
+      }),
+    ]
+  });
   pageOf([card]);
   const { low, high } = ES.parseMoneyRange(ES.cardPriceText(card.querySelector(ES.CARD_PRICE_SEL)));
   assert.equal(low, 10);

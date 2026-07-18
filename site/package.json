@@ -1,23 +1,23 @@
 {
   "name": "ebay-summer-site",
-  "version": "0.0.0",
-  "description": "Landing page + changelog for the eBay Σummer extension (Vite + React, builds to ../docs)",
-  "license": "GPL-3.0-or-later",
-  "private": true,
-  "type": "module",
-  "scripts": {
+    "version": "0.0.0",
+      "description": "Landing page + changelog for the eBay Σummer extension (Vite + React, builds to ../docs)",
+        "license": "GPL-3.0-or-later",
+          "private": true,
+            "type": "module",
+              "scripts": {
     "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "test": "node --test \"test/*.test.js\"",
-    "test:coverage": "node --test --experimental-test-coverage --test-coverage-exclude=\"../src/**\" --test-coverage-exclude=\"../test/**\" --test-coverage-lines=98 --test-coverage-branches=94 --test-coverage-functions=95 \"test/*.test.js\""
+      "build": "vite build",
+        "preview": "vite preview",
+          "test": "node --test \"test/*.test.js\"",
+            "test:coverage": "node --test --experimental-test-coverage --test-coverage-exclude=\"../src/**\" --test-coverage-exclude=\"../test/**\" --test-coverage-lines=98 --test-coverage-branches=94 --test-coverage-functions=95 \"test/*.test.js\""
   },
   "dependencies": {
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+      "react-dom": "^18.3.1"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^6.0.3",
-    "vite": "^8.1.5"
+      "vite": "^8.1.5"
   }
 }
