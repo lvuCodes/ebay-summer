@@ -11,8 +11,14 @@
   /* Orange sibling of the purple .ebay-estimation box, seated directly UNDER the
      condition field and stretched to the full width of that column, so its size
      is fixed by the layout — the input has a fixed width and the box does NOT
-     grow/shrink as you type. Roomier (taller + wider) than the compact boxes. */
+     grow/shrink as you type. Roomier (taller + wider) than the compact boxes.
+     Same two-property palette as the estimation box: --ink (borders, text) and
+     --surface (background + hover tint), so no orange is ever hardcoded twice.
+     The below-shipping warning + unparseable-input states keep their own reds —
+     they signal error, not brand. */
   .ebay-bid-calc {
+    --ink: #b35a00 !important;
+    --surface: #fff4e6 !important;
     display: block !important;
     width: 100% !important;
     max-width: 100% !important;
@@ -29,20 +35,20 @@
     overflow: hidden !important;
     margin: 12px 0 3px !important;
     padding: 10px 12px !important;
-    border: 1px dashed #c25e00 !important;
+    border: 1px dashed var(--ink) !important;
     border-radius: 8px !important;
-    background: #fff4e6 !important;
-    color: #8a4300 !important;
+    background: var(--surface) !important;
+    color: var(--ink) !important;
     line-height: 1.2 !important;
   }
   .ebay-bid-calc__label {
     display: block !important;
     font-size: .72rem !important;
-    line-height: 1.15 !important;
+    line-height: 1.2 !important;
     font-weight: 700 !important;
     letter-spacing: .04em !important;
     text-transform: uppercase !important;
-    color: #b35a00 !important;
+    color: var(--ink) !important;
   }
   /* Header row: the "Bid calculator" label on the left, the ✕ Clear button pushed
      to the far right of the same row. */
@@ -55,12 +61,12 @@
   }
   /* Clear-both-fields button, sitting next to the label. */
   .ebay-bid-calc__reset {
-    padding: 5px 9px !important;
+    padding: 6px 9px !important;
     margin: 0 !important;
-    border: 1px solid #c25e00 !important;
-    border-radius: 5px !important;
+    border: 1px solid var(--ink) !important;
+    border-radius: 6px !important;
     background: #fff !important;
-    color: #8a4300 !important;
+    color: var(--ink) !important;
     font-size: .8rem !important;
     font-weight: 700 !important;
     line-height: 1 !important;
@@ -71,7 +77,7 @@
     justify-content: center !important;
     gap: 4px !important;
   }
-  .ebay-bid-calc__reset:hover { background: #ffe6cc !important; }
+  .ebay-bid-calc__reset:hover { background: color-mix(in srgb, var(--ink) 12%, var(--surface)) !important; }
   /* Grid: row 1 is [ bid field | ⇄ | total field ] with both inputs on the SAME row
      so they line up; row 2 holds the "incl…" sub line in the total column (right of
      the arrows, under the total field). Both fields are fixed-width so the box never
@@ -112,9 +118,9 @@
     display: block !important;
     position: absolute !important;
     left: 8px !important;
-    font-size: 1.15rem !important;
+    font-size: 1.2rem !important;
     font-weight: 800 !important;
-    color: #8a4300 !important;
+    color: var(--ink) !important;
     line-height: 1.2 !important;
     pointer-events: none !important;
   }
@@ -129,13 +135,13 @@
     width: 100% !important;
     max-width: none !important;
     min-width: 0 !important;
-    padding: 5px 8px 5px 18px !important;
+    padding: 6px 8px 6px 18px !important;
     margin: 0 !important;
-    border: 1px solid #c25e00 !important;
-    border-radius: 5px !important;
+    border: 1px solid var(--ink) !important;
+    border-radius: 6px !important;
     background: #fff !important;
-    color: #8a4300 !important;
-    font-size: 1.15rem !important;
+    color: var(--ink) !important;
+    font-size: 1.2rem !important;
     font-weight: 800 !important;
     line-height: 1.2 !important;
     white-space: nowrap !important;
@@ -144,7 +150,7 @@
     text-align: center !important;
   }
   .ebay-bid-calc__input:focus,
-  .ebay-bid-calc__total:focus { outline: none !important; border-color: #8a4300 !important; }
+  .ebay-bid-calc__total:focus { outline: none !important; border-color: var(--ink) !important; }
   /* Red border on whichever field holds unparseable text (empty is neutral). The
      class is set per-field so the reverse (total → bid) direction reddens the total
      box, not the bid box. */
@@ -170,17 +176,17 @@
   .ebay-bid-calc__calc {
     font-size: 1.05rem !important;
     font-weight: 700 !important;
-    color: #b35a00 !important;
+    color: var(--ink) !important;
     white-space: nowrap !important;
   }
-  .ebay-bid-calc__arrow { font-size: 1.2rem !important; color: #b35a00 !important; }
+  .ebay-bid-calc__arrow { font-size: 1.2rem !important; color: var(--ink) !important; }
   /* Formula → number readout AFTER the total field ("=2*12" ⇒ "= $24.00"), shown
      only when the total field holds an "=formula". */
   .ebay-bid-calc__total-calc[hidden] { display: none !important; }
   .ebay-bid-calc__total-calc {
     font-size: 1.05rem !important;
     font-weight: 700 !important;
-    color: #b35a00 !important;
+    color: var(--ink) !important;
     white-space: nowrap !important;
   }
   /* Total field + per-unit share the first row of the total column. The total field
@@ -200,15 +206,15 @@
   .ebay-bid-calc__perunit {
     font-size: .98rem !important;
     font-weight: 700 !important;
-    color: #b35a00 !important;
+    color: var(--ink) !important;
     white-space: nowrap !important;
   }
   /* Sub sits under the total field (row 2, total column), centered under the box. */
   .ebay-bid-calc__sub {
     grid-area: sub !important;
     font-size: .8rem !important;
-    line-height: 1.15 !important;
-    color: #b35a00 !important;
+    line-height: 1.2 !important;
+    color: var(--ink) !important;
     text-align: center !important;
   }
   /* FX line sits under the bid field (row 2, bid column), centered under the box:
@@ -218,8 +224,8 @@
     grid-area: fx !important;
     font-size: .82rem !important;
     font-weight: 700 !important;
-    line-height: 1.15 !important;
-    color: #b35a00 !important;
+    line-height: 1.2 !important;
+    color: var(--ink) !important;
     text-align: center !important;
   }
 

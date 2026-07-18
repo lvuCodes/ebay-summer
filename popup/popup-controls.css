@@ -16,8 +16,8 @@
 
 .switch input {
   position: absolute;
-  width: 1px;
-  height: 1px;
+  width: 2px;
+  height: 2px;
   opacity: 0;
   pointer-events: none;
 }
@@ -44,11 +44,11 @@
   transition: transform 0.15s ease;
 }
 
-.switch input:checked + .switch__slider {
+.switch input:checked+.switch__slider {
   background: var(--accent);
 }
 
-.switch input:checked + .switch__slider::before {
+.switch input:checked+.switch__slider::before {
   transform: translateX(16px);
 }
 
@@ -58,16 +58,16 @@
    looks wrong next to the page toggles. Render a distinct half state: a muted
    accent pill with the knob centered, so it reads as "partial", not off/on.
    Only the page-all select-all is ever set indeterminate. */
-.switch input:indeterminate + .switch__slider {
+.switch input:indeterminate+.switch__slider {
   background: var(--accent);
   opacity: 0.5;
 }
 
-.switch input:indeterminate + .switch__slider::before {
+.switch input:indeterminate+.switch__slider::before {
   transform: translateX(8px);
 }
 
-.switch input:focus-visible + .switch__slider {
+.switch input:focus-visible+.switch__slider {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
@@ -192,6 +192,7 @@
   accent-color: var(--accent);
   cursor: pointer;
 }
+
 .radio span {
   line-height: 1;
 }
@@ -202,7 +203,7 @@ input[type="number"] {
   flex: 0 0 auto;
   width: 6.5em;
   padding: 6px 8px;
-  font-size: 13px;
+  font-size: 12px;
   border: 1px solid var(--border);
   border-radius: 6px;
 }
@@ -217,7 +218,7 @@ select {
   width: 6.5em;
   padding: 6px 8px;
   font: inherit;
-  font-size: 13px;
+  font-size: 12px;
   color: var(--fg);
   background: var(--bg);
   border: 1px solid var(--border);
@@ -245,7 +246,7 @@ select:focus {
   min-width: 0;
   padding: 6px 8px;
   font: inherit;
-  font-size: 13px;
+  font-size: 12px;
   color: var(--fg);
   background: var(--bg);
   border: 1px solid var(--border);
@@ -315,6 +316,7 @@ select:focus {
   gap: 6px;
   margin-bottom: 8px;
 }
+
 .switch-row .switch {
   margin-bottom: 0;
 }
@@ -327,6 +329,7 @@ select:focus {
   color: var(--muted);
   cursor: help;
 }
+
 .info__tip {
   position: absolute;
   bottom: calc(100% + 6px);
@@ -343,13 +346,14 @@ select:focus {
   line-height: 1.35;
   color: var(--bg);
   background: var(--fg);
-  border-radius: 5px;
+  border-radius: 6px;
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.12s ease;
   pointer-events: none;
   z-index: 20;
 }
+
 .info:hover .info__tip,
 .info:focus-visible .info__tip {
   opacity: 1;
@@ -389,6 +393,7 @@ select:focus {
    this file, after the light-mode input/select rules above, so the override
    order never depends on which stylesheet the browser loads first. */
 @media (prefers-color-scheme: dark) {
+
   input[type="number"],
   select {
     background: #111827;

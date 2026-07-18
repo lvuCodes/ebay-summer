@@ -1,3 +1,5 @@
+// eBay Σummer. Copyright (C) 2026 lvuCodes. Licensed under GPL-3.0-or-later; see LICENSE.md.
+//
 // Dispatcher. All the earlier modules load first (see manifest) and attach
 // their API to ES; this file computes the page kind, runs every registered
 // feature's hooks, keeps them running as the page mutates, and reacts to live

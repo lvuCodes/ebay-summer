@@ -1,3 +1,5 @@
+// eBay Σummer. Copyright (C) 2026 lvuCodes. Licensed under GPL-3.0-or-later; see LICENSE.md.
+//
 // Service worker: turns "auction ending soon" messages from the content script
 // into system notifications, auto-dismisses them when the auction ends, and
 // focuses the originating tab when a notification is clicked.
