@@ -16,7 +16,13 @@
     ["page-watchlist", "pageWatchlist", "Watchlist"],
     ["page-bids", "pageBidsOffers", "Bids & Offers"],
     ["page-summary", "pageSummary", "Summary"],
-    ["page-rvi", "pageRecentView", "Recently viewed"],
+    // Recently viewed is withheld from the popup: its .container-item card
+    // markup is unverified against eBay's July 2026 reskin (which renamed the
+    // search card out from under us), and a switch users can turn on that then
+    // does nothing is worse than an absent one. pageRecentView stays registered
+    // in schema.js and defaults to false, so the renderer is intact and this is
+    // a one-line restore once a Recently Viewed capture confirms the selectors.
+    // ["page-rvi", "pageRecentView", "Recently viewed"],
     ["page-saved", "pageSaved", "Saved feed"],
   ];
 

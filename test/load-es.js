@@ -18,6 +18,9 @@ require("../src/calculator/calc.js");
 require("../src/calculator/css-box.js");
 require("../src/calculator/css-widgets.js");
 require("../src/calculator/pickup.js");
+// box.js only touches document inside makeBox, so it loads fine here — and it
+// must load before the render modules, which destructure makeBox at load time.
+require("../src/calculator/box.js");
 require("../src/calculator/render-cards.js");
 require("../src/calculator/render-listing.js");
 require("../src/calculator/feature.js");

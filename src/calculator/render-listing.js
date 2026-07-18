@@ -6,7 +6,7 @@
 (function () {
   "use strict";
   const ES = (globalThis.ES = globalThis.ES || {});
-  const { parseMoney, parseMoneyUS, parseMoneyRange, firstAmount, modalOfferUSD, bidModalFigures, makeBox, makeBidCalc, findShipping, isPickupOnly, listingIsPickupOnly } =
+  const { parseMoney, parseMoneyUS, parseMoneyRange, firstAmount, modalOfferUSD, bidModalFigures, makeBox, makeBidCalc, findShipping, isPickupOnly, listingIsPickupOnly, CARD_SEL, CARD_PRICE_SEL, insertCardBox } =
     ES;
 
   // A price "leaf" such as "$12.34", "US $1,200", or a "$171 - $796" range.
@@ -406,20 +406,17 @@
       count++;
     }
 
-    // 2. .su-item-card carousels (search-style card).
-    document.querySelectorAll(".su-item-card").forEach((card) => {
+    // 2. Search-style card carousels (both the old .su-item-card markup and the
+    // .s-card reskin — CARD_SEL matches either; see render-cards.js).
+    document.querySelectorAll(CARD_SEL).forEach((card) => {
       if (card.querySelector("[data-ebay-total]")) return; // already done
-      const priceEl = card.querySelector(".su-item-card__price");
+      const priceEl = card.querySelector(CARD_PRICE_SEL);
       const { low, high } = parseMoneyRange(priceEl && priceEl.textContent);
       if (low == null) return;
       // No per-unit toggle on the listing page's non-main cards — their panel is
       // unreachable (eBay's card-click navigation can't be reliably suppressed).
       const box = makeBox(low, findShipping(card), false, high, undefined, true, undefined, isPickupOnly(card));
-      const header = card.querySelector(".su-item-card__header");
-      const pc = priceEl.closest(".su-item-card__price-container");
-      if (header) header.appendChild(box);
-      else if (pc && pc.parentElement) pc.parentElement.insertBefore(box, pc);
-      else (card.querySelector(".su-card-container__content") || card).appendChild(box);
+      insertCardBox(card, priceEl, box);
       count++;
     });
 
@@ -446,7 +443,7 @@
       }
       if (!priceEl || !card || card === document.body || seen.has(card)) return;
       if (mainPrice && mainPrice.contains(priceEl)) return; // skip the main listing price
-      if (card.closest(".su-item-card")) return; // handled in pass 2
+      if (card.closest(CARD_SEL)) return; // handled in pass 2
       if (card.querySelector("[data-ebay-total]")) return;
       const { low, high } = parseMoneyRange(priceEl.textContent);
       if (low == null) return;
