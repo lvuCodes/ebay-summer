@@ -5,6 +5,6 @@
   "private": true,
   "scripts": {
     "test": "node --test \"test/*.test.js\"",
-    "test:coverage": "node --test --experimental-test-coverage --test-coverage-lines=74 --test-coverage-branches=90 --test-coverage-functions=76 \"test/*.test.js\""
+    "test:coverage": "node --test --experimental-test-coverage --test-coverage-lines=76 --test-coverage-branches=92 --test-coverage-functions=78 \"test/*.test.js\""
   }
 }

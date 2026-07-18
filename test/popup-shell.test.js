@@ -6,7 +6,7 @@
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
 const path = require("node:path");
-const { makeDoc, installGlobals } = require("./fake-dom.js");
+const { makeDoc, installGlobals } = require("./fake-dom.cjs");
 
 installGlobals();
 
