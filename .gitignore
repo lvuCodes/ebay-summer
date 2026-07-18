@@ -14,3 +14,6 @@ docs/
 
 # Dependencies (installed via npm; not tracked).
 node_modules/
+
+# Saved eBay page captures for selector debugging (multi-MB, not source)
+debug/
