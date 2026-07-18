@@ -198,6 +198,12 @@
         ? shipFlag(cost, ship, config.shipPct, config.shipFloor, pickupOnly)
         : "";
       labelEl.textContent = (labelPrefix ? labelPrefix + " · " : "") + p.label;
+      // eBay italicises a ranged price on its own cards, so a ranged estimate
+      // reads as one too. Deliberately NOT gated on flagRange — that toggle owns
+      // the 🚦 warning, while the italic is just how a range is spelled here.
+      // Toggled rather than added: paint() re-runs on live refresh, and a card
+      // whose price stops being a range must lose the italic again.
+      amountEl.classList.toggle("ebay-estimation__amount--range", !!p.range);
       // 🚦 prefixes a price range (gated by flagRange — "Warn on ranged items");
       // the shipping dot (🟢/🟡) trails the amount.
       amountEl.innerHTML =

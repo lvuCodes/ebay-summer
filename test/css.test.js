@@ -28,6 +28,17 @@ test("SHARED_CSS: home item-carousels release eBay's pinned .carousel__list heig
   assert.match(block.slice(0, block.indexOf("}")), /height:\s*auto\s*!important/);
 });
 
+// --- ranged totals: italic, mirroring eBay's own ranged prices -------------
+test("SHARED_CSS: a ranged total is italic but its flag emoji is not", () => {
+  // The italic is the range's spelling, not the 🚦 warning — it must not be
+  // gated behind flagRange. An italicised emoji renders as a glitch, so the
+  // flag is explicitly restored to upright inside the italic amount.
+  const block = SHARED_CSS.slice(SHARED_CSS.indexOf(".ebay-estimation__amount--range"));
+  assert.match(block.slice(0, block.indexOf("}")), /font-style:\s*italic\s*!important/);
+  const flag = block.slice(block.indexOf(".ebay-estimation__amount--range .ebay-estimation__flag"));
+  assert.match(flag.slice(0, flag.indexOf("}")), /font-style:\s*normal\s*!important/);
+});
+
 // --- foucStyleSpecs: early.js document_start replay ------------------------
 test("foucStyleSpecs: emits both styles with the css.js style ids", () => {
   const specs = foucStyleSpecs("SHARED", "PAGE");

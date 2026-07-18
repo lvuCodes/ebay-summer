@@ -3,7 +3,7 @@
 // shipping-cost flag dot, and the per-unit count/line helpers.
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
-const { boxParts, calcTotal, shipLabel, shipFlag, clampCount, perUnitText, parseCount } = require("./load-es.js");
+const { boxParts, calcTotal, shipLabel, shipFlag, clampCount, perUnitText, parseCount, pctText } = require("./load-es.js");
 
 const close = (a, b) => Math.abs(a - b) < 1e-9;
 
@@ -51,6 +51,20 @@ test("boxParts: shipUnknownText flows into the sub (amber home box)", () => {
   assert.match(p.sub, /\+ ship TBD$/);
   const dflt = boxParts(100, null, 0.0825);
   assert.match(dflt.sub, /\+ ship n\/a$/);
+});
+
+// --- pctText: the tax-rate label -------------------------------------------
+// Exported off ES so the site's landing-page demo renders the same rate label
+// as the extension instead of re-deriving one; pinned here because the site
+// consumes it directly and a format change there would be invisible.
+test("pctText: a rate becomes a two-decimal percent label", () => {
+  assert.equal(pctText(0.0825), "8.25%");
+  assert.equal(pctText(0.07), "7.00%");
+  assert.equal(pctText(0), "0.00%");
+});
+
+test("pctText: the label matches the one boxParts renders", () => {
+  assert.ok(boxParts(100, 10, 0.0825).sub.includes(pctText(0.0825)));
 });
 
 // --- boxParts: text the box renders, across shipping states ----------------
