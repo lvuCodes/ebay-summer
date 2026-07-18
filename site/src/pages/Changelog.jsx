@@ -1,11 +1,12 @@
 import BrandStripe from "../components/BrandStripe.jsx";
 import Inline from "../components/Inline.jsx";
-import { listReleases, groupLabel } from "../lib/releases.js";
+import { listReleases, latestRelease, groupLabel } from "../lib/releases.js";
 import { REPO_URL, LICENSE_URL } from "../lib/site.js";
 import releasesData from "../data/releases.json";
 
 export default function Changelog() {
   const releases = listReleases(releasesData);
+  const latest = latestRelease(releasesData);
 
   return (
     <>
@@ -22,12 +23,12 @@ export default function Changelog() {
 
       <main>
         <div className="wrap">
-          {releases.map((r, idx) => (
+          {releases.map((r) => (
             <article className="release" key={r.version}>
               <div className="release-head">
                 <h2>v{r.version}</h2>
-                <span className="date">{r.date}</span>
-                {idx === 0 && <span className="latest">Latest</span>}
+                <span className="date">{r.unreleased ? "unreleased" : r.date}</span>
+                {r.version === latest?.version && <span className="latest">Latest</span>}
               </div>
               {r.summary && <p className="release-summary">{r.summary}</p>}
 
