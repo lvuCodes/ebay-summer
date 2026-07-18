@@ -18,6 +18,7 @@ require("../src/notifications/sounds.js");
 require("../src/calculator/schema.js");
 require("../src/notifications/schema.js");
 require("../src/core/defaults.js");
+require("../src/calculator/popup.js");
 require("../src/notifications/popup.js");
 
 module.exports = { ES, makeDoc };

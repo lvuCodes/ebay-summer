@@ -8,20 +8,24 @@ const { test } = require("node:test");
 const assert = require("node:assert/strict");
 const { ES } = require("./load-popup.js");
 
-test("a feature registers exactly one section, with its chrome described", () => {
+test("the released popup is exactly the calculator and notifications sections", () => {
+  assert.deepEqual(
+    ES.popupSections.map((s) => s.id),
+    ["esttotal", "showtotal", "auction"],
+  );
   const auction = ES.popupSections.find((s) => s.id === "auction");
-  assert.ok(auction, "notifications/popup.js registered no section");
   assert.equal(auction.title, "Auction Ending Notification");
   assert.equal(auction.column, 2);
   assert.equal(typeof auction.render, "function");
 });
 
-test("collectPopupControls flattens every section's controls in order", () => {
-  const checks = ES.collectPopupControls("checks").map((c) => c.key);
-  assert.ok(checks.includes("notifyEnabled"));
-  assert.ok(checks.includes("notifySoundEnabled"));
+test("collectPopupControls flattens every section's controls in registration order", () => {
   const fields = ES.collectPopupControls("fields").map((f) => f.key);
-  assert.deepEqual(fields, ["notifyAt1", "notifyAt2"]);
+  assert.deepEqual(fields, ["taxRate", "shipFloor", "shipPct", "notifyAt1", "notifyAt2"]);
+  const checks = ES.collectPopupControls("checks").map((c) => c.key);
+  assert.ok(checks.includes("estTotal"));
+  assert.ok(checks.includes("pageSearch"));
+  assert.ok(checks.includes("notifyEnabled"));
 });
 
 test("collectPopupControls rejects an unknown control kind", () => {
@@ -72,12 +76,41 @@ test("the sound select offers exactly the SOUNDS presets", () => {
   assert.deepEqual(values, Object.keys(ES.SOUNDS));
 });
 
-test("section toggles name only ids the section itself renders", () => {
-  const auction = ES.popupSections.find((s) => s.id === "auction");
-  for (const t of auction.toggles) {
-    assert.ok(
-      t.sections.every((id) => id === `body-${auction.id}` || id.startsWith(`body-${auction.id}`)),
-      `toggle "${t.control}" reveals ${t.sections}, which it does not own`,
-    );
+// Mount every registered section the way the popup shell will, so the assertions
+// below run against the assembled DOM rather than one section in isolation.
+function mountAll() {
+  const root = ES.h("div", {});
+  for (const s of ES.popupSections) {
+    const { header, body } = ES.sectionEl(s.id, s.title, s.master, s.masterTitle);
+    s.render(body);
+    root.appendChild(header);
+    root.appendChild(body);
   }
+  return root;
+}
+
+// A toggle naming an id nothing renders would throw on `.hidden` at popup open —
+// the same shape of failure as the v1.1.1 crash, one property further along.
+test("every toggle's control and target ids exist in the assembled popup", () => {
+  const root = mountAll();
+  for (const t of ES.collectPopupToggles()) {
+    assert.ok(root.querySelector(`#${t.control}`), `toggle control #${t.control} is never rendered`);
+    for (const id of t.sections) {
+      assert.ok(root.querySelector(`#${id}`), `toggle "${t.control}" targets #${id}, never rendered`);
+    }
+  }
+});
+
+test("every registered control exists in the assembled popup", () => {
+  const root = mountAll();
+  for (const kind of ["fields", "checks", "selects", "texts"]) {
+    for (const c of ES.collectPopupControls(kind)) {
+      assert.ok(root.querySelector(`#${c.id}`), `${kind} control #${c.id} is never rendered`);
+    }
+  }
+});
+
+test("section ids are unique, so the chrome ids they derive cannot collide", () => {
+  const ids = ES.popupSections.map((s) => s.id);
+  assert.equal(new Set(ids).size, ids.length);
 });
