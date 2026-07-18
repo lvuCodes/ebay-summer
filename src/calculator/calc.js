@@ -429,6 +429,7 @@
     resolveShipping,
     calcTotal,
     shipLabel,
+    pctText,
     boxParts,
     clampCount,
     parseCount,

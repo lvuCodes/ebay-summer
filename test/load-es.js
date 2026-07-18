@@ -4,8 +4,10 @@
 // requiring them is safe — the DOM-free decision logic they export
 // (listingUnavailable, …) is tested without a browser.
 // early.js's DOM/localStorage side effects are guarded off when those globals
-// are absent. box.js/bid-calc.js/notify.js/core/style.js/core/content.js are
+// are absent. bid-calc.js/notify.js/core/style.js/core/content.js are
 // DOM-or-chrome modules with nothing DOM-free to test, so they aren't loaded.
+// box.js IS loaded (see below) but live.js, which it destructures registerLive/
+// refreshLive from, is not — so makeBox cannot be CALLED here, only imported.
 require("../src/core/registry.js");
 require("../src/core/sanitize.js");
 require("../src/notifications/sounds.js");
@@ -18,6 +20,9 @@ require("../src/calculator/calc.js");
 require("../src/calculator/css-box.js");
 require("../src/calculator/css-widgets.js");
 require("../src/calculator/pickup.js");
+// box.js only touches document inside makeBox, so it loads fine here — and it
+// must load before the render modules, which destructure makeBox at load time.
+require("../src/calculator/box.js");
 require("../src/calculator/render-cards.js");
 require("../src/calculator/render-listing.js");
 require("../src/calculator/feature.js");

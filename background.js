@@ -14,7 +14,7 @@
 function iconFor(msg) {
   return typeof msg.iconUrl === "string" && /^https?:\/\//.test(msg.iconUrl)
     ? msg.iconUrl
-    : "icons/icon128.png";
+    : chrome.runtime.getURL("icons/icon128.png");
 }
 
 chrome.runtime.onMessage.addListener((msg, sender) => {
@@ -39,15 +39,21 @@ chrome.runtime.onMessage.addListener((msg, sender) => {
     // Auto-dismiss every outstanding "ending soon" badge this tab raised — the
     // countdown is over, so a lingering "ending in Ns" badge is now stale.
     const prefix = `ebay|${tab.id}|`;
+    const endedId = `ebay|${tab.id}|${tab.windowId}|ended`;
     chrome.notifications.getAll((all) => {
       Object.keys(all || {}).forEach((id) => {
+        // A prior "ended" badge shares this prefix. Clearing one we are about to
+        // re-create races the create on the same id and can erase it, so leave
+        // it for create() to replace in place; clear it only when it is not
+        // being replaced.
+        if (id === endedId && msg.persistent) return;
         if (id.startsWith(prefix)) chrome.notifications.clear(id);
       });
       // Opt-in: leave a single persistent "ended" badge in their place. Same id
       // shape (so a click still focuses the tab); the "ended" stamp keeps it
       // identifiable and distinct from the swept "ending soon" ids.
       if (msg.persistent) {
-        chrome.notifications.create(`ebay|${tab.id}|${tab.windowId}|ended`, {
+        chrome.notifications.create(endedId, {
           type: "basic",
           iconUrl: iconFor(msg),
           title: "Auction ended",
@@ -61,6 +67,16 @@ chrome.runtime.onMessage.addListener((msg, sender) => {
   }
 });
 
+// A badge is requireInteraction, so it can be clicked long after the tab or
+// window it names has closed. Without a callback that failure lands in an
+// unchecked runtime.lastError and vanishes; surface it instead.
+function warnIfGone(what, id) {
+  return () => {
+    const err = chrome.runtime.lastError;
+    if (err) console.warn(`eBay Summer: could not focus ${what} ${id} — ${err.message}`);
+  };
+}
+
 chrome.notifications.onClicked.addListener((id) => {
   const parts = id.split("|");
   if (parts[0] !== "ebay") return;
@@ -68,7 +84,11 @@ chrome.notifications.onClicked.addListener((id) => {
   const windowId = Number(parts[2]);
   // Focus the window, then activate the tab. Neither call needs the sensitive
   // "tabs" permission (we only touch active/focused, not url/title).
-  if (Number.isInteger(windowId)) chrome.windows.update(windowId, { focused: true });
-  if (Number.isInteger(tabId)) chrome.tabs.update(tabId, { active: true });
+  if (Number.isInteger(windowId)) {
+    chrome.windows.update(windowId, { focused: true }, warnIfGone("window", windowId));
+  }
+  if (Number.isInteger(tabId)) {
+    chrome.tabs.update(tabId, { active: true }, warnIfGone("tab", tabId));
+  }
   chrome.notifications.clear(id);
 });

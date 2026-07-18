@@ -22,17 +22,21 @@ test("cmpVersion orders semver numerically, not lexically", () => {
 test("listReleases returns newest first", () => {
   const versions = listReleases(data).map((r) => r.version);
   assert.deepEqual(versions, [...versions].sort((a, b) => cmpVersion(b, a)));
-  assert.equal(versions[0], "1.1.0");
 });
 
+// Derived rather than pinned to a literal version, so cutting a release does not
+// require editing this file.
 test("latestRelease is the highest version", () => {
-  assert.equal(latestRelease(data).version, "1.1.0");
+  const versions = listReleases(data).map((r) => r.version);
+  const highest = [...versions].sort((a, b) => cmpVersion(b, a))[0];
+  assert.equal(latestRelease(data).version, highest);
 });
 
 test("groupLabel maps known types and passes through unknowns", () => {
   assert.equal(groupLabel("added"), "Added");
   assert.equal(groupLabel("fixed"), "Fixed");
   assert.equal(groupLabel("changed"), "Changed");
+  assert.equal(groupLabel("known-issues"), "Known Issues");
   assert.equal(groupLabel("weird"), "weird");
 });
 

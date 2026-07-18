@@ -2,7 +2,7 @@
 // every feature's popup component in popup.html order into a fresh globalThis.ES.
 // node --test gives each test file its own process, so this ES is isolated from
 // load-es.js and load-dom.js.
-const { makeDoc, installGlobals } = require("./fake-dom.js");
+const { makeDoc, installGlobals } = require("./fake-dom.cjs");
 
 installGlobals();
 global.document = makeDoc();

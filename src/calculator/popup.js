@@ -16,7 +16,12 @@
     ["page-watchlist", "pageWatchlist", "Watchlist"],
     ["page-bids", "pageBidsOffers", "Bids & Offers"],
     ["page-summary", "pageSummary", "Summary"],
-    ["page-rvi", "pageRecentView", "Recently viewed"],
+    // Recently viewed is hidden for v1.1.1: renderRvi's .container-item selectors
+    // no longer match and no boxes are drawn, so offering the toggle would only
+    // promise something that does not happen. The renderer, its route entry, and
+    // the pageRecentView setting all stay in place — restoring the toggle is
+    // uncommenting this line once a Recently Viewed capture pins the new markup.
+    // ["page-rvi", "pageRecentView", "Recently viewed"],
     ["page-saved", "pageSaved", "Saved feed"],
   ];
 

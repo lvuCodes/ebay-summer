@@ -1,8 +1,8 @@
 // Landing-page demo: wires a purple estimation box + orange bid calc given their
 // root elements, and returns a teardown fn for React's useEffect cleanup. A thin
 // DOM shell — all the math (evalExpr, calcTotal, per-unit, bidirectional
-// bid<->total) lives, tested, in ../lib/demo-calc.js.
-import { fmt, pctText, calcTotal, shipLabel, clampCount, readInput } from "../lib/demo-calc.js";
+// bid<->total) is the extension's own, bridged in via ../lib/extension-calc.js.
+import { fmtMoney, pctText, calcTotal, shipLabel, clampCount, bidCalcInput } from "../lib/extension-calc.js";
 
 export function initDemo(box, calc) {
   if (!box || !calc) return () => {};
@@ -29,14 +29,14 @@ export function initDemo(box, calc) {
   const perEl = box.querySelector(".ebay-estimation__perunit");
   const shipBtn = box.querySelector(".ebay-estimation__ship");
 
-  amountEl.innerHTML = "US $" + fmt(base.total) +
+  amountEl.innerHTML = "US $" + fmtMoney(base.total) +
     (SHIP === 0 ? ' <span class="ebay-estimation__flag">🟢</span>' : "");
-  subEl.textContent = "US $" + fmt(ITEM) + " + (" + pct + " tax → $" + fmt(base.tax) + ") " + shipLabel(SHIP);
+  subEl.textContent = "US $" + fmtMoney(ITEM) + " + (" + pct + " tax → $" + fmtMoney(base.tax) + ") " + shipLabel(SHIP);
 
   function renderPanel() {
     const basis = includeShip ? base.total : totalNoShip;
     const note = hasShip ? (includeShip ? " (incl. ship)" : " (excl. ship)") : "";
-    perEl.textContent = count + " @ $" + fmt(basis / count) + "/unit" + note;
+    perEl.textContent = count + " @ $" + fmtMoney(basis / count) + "/unit" + note;
   }
   function activate() { perUnitActive = true; renderBidPerUnit(); }
   function commitCount(n) {
@@ -52,14 +52,14 @@ export function initDemo(box, calc) {
     if (willOpen) { renderPanel(); activate(); }
   });
   on(countEl, "input", function () {
-    count = clampCount(readInput(countEl.value).value);
+    count = clampCount(bidCalcInput(countEl.value).value);
     renderPanel(); activate();
   });
-  on(countEl, "change", function () { commitCount(readInput(countEl.value).value); });
-  on(countEl, "blur", function () { commitCount(readInput(countEl.value).value); });
+  on(countEl, "change", function () { commitCount(bidCalcInput(countEl.value).value); });
+  on(countEl, "blur", function () { commitCount(bidCalcInput(countEl.value).value); });
   box.querySelectorAll(".ebay-estimation__step").forEach(function (btn) {
     on(btn, "click", function () {
-      commitCount(clampCount(readInput(countEl.value).value) + Number(btn.getAttribute("data-step")));
+      commitCount(clampCount(bidCalcInput(countEl.value).value) + Number(btn.getAttribute("data-step")));
     });
   });
   on(shipBtn, "click", function () {
@@ -86,22 +86,22 @@ export function initDemo(box, calc) {
   function renderBidPerUnit() {
     if (lastValid && perUnitActive) {
       const basis = includeShip ? lastTotal : lastTotalNoShip;
-      bidPerEl.textContent = "($" + fmt(basis / count) + "/unit)";
+      bidPerEl.textContent = "($" + fmtMoney(basis / count) + "/unit)";
       bidPerEl.removeAttribute("hidden");
     } else bidPerEl.setAttribute("hidden", "");
   }
   function fromBid() {
-    const r = readInput(bidIn.value);
+    const r = bidCalcInput(bidIn.value);
     const typed = bidIn.value.trim() !== "";
     const valid = r.value != null && Number.isFinite(r.value) && r.value >= 0;
-    if (r.isFunction && valid) { calcEl.textContent = "= $" + fmt(r.value); calcEl.removeAttribute("hidden"); }
+    if (r.isFunction && valid) { calcEl.textContent = "= $" + fmtMoney(r.value); calcEl.removeAttribute("hidden"); }
     else calcEl.setAttribute("hidden", "");
     totalCalcEl.setAttribute("hidden", "");
     if (valid) {
       const c = calcTotal(r.value, SHIP, TAX);
       totIn.value = c.total.toFixed(2);
       lastTotal = c.total; lastTotalNoShip = r.value + c.tax; lastValid = true;
-      bidSubEl.textContent = "incl. " + pct + " tax ($" + fmt(c.tax) + ") " + shipLabel(SHIP);
+      bidSubEl.textContent = "incl. " + pct + " tax ($" + fmtMoney(c.tax) + ") " + shipLabel(SHIP);
     } else {
       totIn.value = ""; lastValid = false;
       bidSubEl.textContent = "incl. " + pct + " tax " + shipLabel(SHIP);
@@ -111,22 +111,22 @@ export function initDemo(box, calc) {
     renderBidPerUnit(); syncDollar();
   }
   function fromTotal() {
-    const r = readInput(totIn.value);
+    const r = bidCalcInput(totIn.value);
     const typed = totIn.value.trim() !== "";
     const valid = r.value != null && Number.isFinite(r.value) && r.value >= 0;
     const ship = SHIP || 0;
     const bid = valid ? (r.value - ship) / (1 + TAX) : null;
     const below = valid && bid < 0;
     calcEl.setAttribute("hidden", "");
-    if (r.isFunction && valid) { totalCalcEl.textContent = "= $" + fmt(r.value); totalCalcEl.removeAttribute("hidden"); }
+    if (r.isFunction && valid) { totalCalcEl.textContent = "= $" + fmtMoney(r.value); totalCalcEl.removeAttribute("hidden"); }
     else totalCalcEl.setAttribute("hidden", "");
     if (valid && !below) {
       bidIn.value = bid.toFixed(2);
       lastTotal = r.value; lastTotalNoShip = r.value - ship; lastValid = true;
-      bidSubEl.textContent = "incl. " + pct + " tax ($" + fmt(bid * TAX) + ") " + shipLabel(SHIP);
+      bidSubEl.textContent = "incl. " + pct + " tax ($" + fmtMoney(bid * TAX) + ") " + shipLabel(SHIP);
     } else {
       bidIn.value = ""; lastValid = false;
-      bidSubEl.textContent = below ? "target below $" + fmt(ship) + " shipping" : "incl. " + pct + " tax " + shipLabel(SHIP);
+      bidSubEl.textContent = below ? "target below $" + fmtMoney(ship) + " shipping" : "incl. " + pct + " tax " + shipLabel(SHIP);
     }
     totIn.classList.toggle("ebay-bid-calc__field--invalid", typed && !valid);
     bidIn.classList.remove("ebay-bid-calc__field--invalid");

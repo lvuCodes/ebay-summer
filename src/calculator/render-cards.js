@@ -74,25 +74,70 @@
     return injectColTotals();
   }
 
+  // --- Search-result card markup -------------------------------------------
+  // eBay reskinned the result card in July 2026: .su-item-card became .s-card,
+  // .su-item-card__price became .s-card__price, and the price moved out of a
+  // .su-item-card__price-container into one of several .s-card__attribute-row
+  // siblings. The old markup may still be served on surfaces we have no capture
+  // of, so BOTH are matched rather than swapped — a card is whichever of the two
+  // it happens to be.
+  const CARD_SEL = ".su-item-card, .s-card";
+  const CARD_PRICE_SEL = ".su-item-card__price, .s-card__price";
+  // Row wrapping the price, used as the insert anchor when no header exists.
+  const CARD_PRICE_ROW_SEL = ".su-item-card__price-container, .s-card__attribute-row";
+  // The card's header block. .su-card-container__header exists in both variants
+  // and is the new markup's only header, but the old markup's own
+  // .su-item-card__header is a different (inner) element — prefer it so the old
+  // layout is untouched.
+  // These are two constants, checked in order, rather than one comma list because
+  // a selector list has no precedence — querySelector returns the first match in
+  // DOCUMENT order, and .su-card-container__header is the OUTER element, so a
+  // single list would hand back the container on old markup and move the box out
+  // of the inner header it has always lived in.
+  const CARD_HEADER_OLD_SEL = ".su-item-card__header";
+  const CARD_HEADER_NEW_SEL = ".su-card-container__header";
+
+  // The card's price text. On the reskin a range is split across three sibling
+  // .s-card__price spans ("$10.75" / " to " / "$30.93") inside ONE attribute row,
+  // so reading a single element drops the high end and understates the estimate.
+  // Joining the row's spans restores it. Scoped to the price's OWN row, never the
+  // whole card: an auction+BIN card carries a second, unrelated price in a
+  // different row ("$10.00 / 0 bids" and "$13.00 / Buy It Now"), and merging those
+  // would invent a range spanning two separate offers. Old markup keeps its single
+  // element, which held the whole "$171 - $796" string already.
+  function cardPriceText(priceEl) {
+    if (!priceEl) return null;
+    const row = priceEl.closest(CARD_PRICE_ROW_SEL);
+    const parts = row ? row.querySelectorAll(CARD_PRICE_SEL) : null;
+    if (!parts || parts.length < 2) return priceEl.textContent;
+    return Array.from(parts, (el) => el.textContent).join("");
+  }
+
+  // Place an estimation box inside a search-style card. Falls back down the
+  // three anchors so a further reskin degrades to "somewhere sensible in the
+  // card" instead of dropping the box. Shared with render-listing.js's carousel
+  // pass, which injects into the same card component.
+  function insertCardBox(card, priceEl, box) {
+    const header =
+      card.querySelector(CARD_HEADER_OLD_SEL) || card.querySelector(CARD_HEADER_NEW_SEL);
+    const row = priceEl.closest(CARD_PRICE_ROW_SEL);
+    if (header) header.appendChild(box);
+    else if (row && row.parentElement) row.parentElement.insertBefore(box, row);
+    else (card.querySelector(".su-card-container__content") || card).appendChild(box);
+  }
+
   // --- Search results (/sch/) -----------------------------------------------
-  // Every result is an .su-item-card; price in .su-item-card__price. For a range
-  // ("$171 - $796") parseMoney takes the low end.
+  // For a price range ("$171 - $796") parseMoneyRange takes both ends.
   function renderSearch() {
     let count = 0;
-    document.querySelectorAll(".su-item-card").forEach((card) => {
+    document.querySelectorAll(CARD_SEL).forEach((card) => {
       if (card.querySelector("[data-ebay-total]")) return; // already done
-      const priceEl = card.querySelector(".su-item-card__price");
-      const { low, high } = parseMoneyRange(priceEl && priceEl.textContent);
+      const priceEl = card.querySelector(CARD_PRICE_SEL);
+      const { low, high } = parseMoneyRange(cardPriceText(priceEl));
       if (low == null) return;
       const shipping = findShipping(card);
-      // Append INTO .su-item-card__header so the box lands in the header's grid
-      // row 2 (under the subtitle, directly above the price-container in row 3).
       const box = makeBox(low, shipping, false, high, undefined, false, undefined, isPickupOnly(card));
-      const header = card.querySelector(".su-item-card__header");
-      const pc = priceEl.closest(".su-item-card__price-container");
-      if (header) header.appendChild(box);
-      else if (pc && pc.parentElement) pc.parentElement.insertBefore(box, pc);
-      else (card.querySelector(".su-card-container__content") || card).appendChild(box);
+      insertCardBox(card, priceEl, box);
       count++;
     });
     return count;
@@ -238,6 +283,10 @@
   }
 
   Object.assign(ES, {
+    CARD_SEL,
+    CARD_PRICE_SEL,
+    cardPriceText,
+    insertCardBox,
     findShipping,
     renderBids,
     renderSummary,
