@@ -53,3 +53,7 @@ chrome.storage.sync.set({ taxRate: 0.10, shipFloor: 8, shipPct: 0.4 }); // recom
 
 Full behaviour, the complete settings-key reference, and implementation notes live in [specs/](specs/). Release history is in [CHANGELOG.md](CHANGELOG.md).
 
+## License
+
+Copyright © 2026 lvuCodes. Licensed under [GPL-3.0-or-later](LICENSE.md).
+

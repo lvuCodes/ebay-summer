@@ -24,7 +24,7 @@ Restores the estimated total box on search results, which eBay's July 2026 card 
 
 ### Known Issues
 
-- Recently viewed does not draw boxes — eBay's markup moved there too, and no capture is on hand to pin the new selectors. Its toggle is hidden for this release rather than offering a switch that does nothing; the setting itself is untouched, so turning it back on later restores whatever was set.
+- Recently viewed does not draw boxes — this was a defect missed in the v1.0.0 release. Its toggle is hidden for this release rather than offering a switch that does nothing; the setting itself is untouched, so turning it back on later restores whatever was set.
 
 Package: [`releases/v1.2.0.zip`](releases/v1.2.0.zip)
 
@@ -41,7 +41,7 @@ Fixes the bid calculator's injection into eBay's redesigned Best-Offer "Make off
 
 - The legacy seller-initiated-offer path is kept as a fallback; the cross-origin review step is left to eBay's own total.
 
-Package: [`releases/v1.1.0.zip`](releases/v1.1.0.zip)
+Package: [`releases/v1.1.0-DEPRECATED.zip`](releases/v1.1.0-DEPRECATED.zip)
 
 ## [1.0.0] — 2026-07-12
 
@@ -57,4 +57,4 @@ Initial standalone release — the landed-cost calculator and auction alerts, sp
 - **Ranges & currencies.** Multi-variation price ranges and non-US-currency listings both compute correctly from the US figures eBay shows.
 - **Popup settings.** Tune the tax rate, shipping-flag thresholds, per-page toggles, and auction alerts from the toolbar popup — every field takes effect on open eBay tabs live.
 
-Package: [`releases/v1.0.0.zip`](releases/v1.0.0.zip)
+Package: [`releases/v1.0.0-DEPRECATED.zip`](releases/v1.0.0-DEPRECATED.zip)

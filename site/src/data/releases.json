@@ -59,7 +59,7 @@
           "type": "known-issues",
           "items": [
             {
-              "body": "Recently viewed does not draw boxes — eBay's markup moved there too, and no capture is on hand to pin the new selectors. Its toggle is hidden for this release rather than offering a switch that does nothing; the setting itself is untouched, so turning it back on later restores whatever was set."
+              "body": "Recently viewed does not draw boxes — this was a defect missed in the v1.0.0 release. Its toggle is hidden for this release rather than offering a switch that does nothing; the setting itself is untouched, so turning it back on later restores whatever was set."
             }
           ]
         }
@@ -95,7 +95,7 @@
         }
       ],
       "snapshot": "releases/v1.1.0/",
-      "package": "v1.1.0.zip"
+      "package": "v1.1.0-DEPRECATED.zip"
     },
     {
       "version": "1.0.0",
@@ -137,7 +137,7 @@
         }
       ],
       "snapshot": "releases/v1.0.0/",
-      "package": "v1.0.0.zip"
+      "package": "v1.0.0-DEPRECATED.zip"
     }
   ]
 }
