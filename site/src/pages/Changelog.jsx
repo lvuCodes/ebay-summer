@@ -1,6 +1,6 @@
 import BrandStripe from "../components/BrandStripe.jsx";
 import Inline from "../components/Inline.jsx";
-import { listReleases, groupLabel } from "../lib/releases.js";
+import { listReleases, groupLabel, releaseUrl } from "../lib/releases.js";
 import { REPO_URL, LICENSE_URL } from "../lib/site.js";
 import releasesData from "../data/releases.json";
 
@@ -46,10 +46,9 @@ export default function Changelog() {
                 </div>
               ))}
 
-              {r.snapshot && (
+              {r.package && (
                 <p className="assets">
-                  Release snapshot: <code>{r.snapshot}</code>
-                  {r.package && <> · packaged <code>{r.package}</code></>}
+                  Package: <a href={releaseUrl(r.package)}><code>{r.package}</code></a>
                 </p>
               )}
             </article>

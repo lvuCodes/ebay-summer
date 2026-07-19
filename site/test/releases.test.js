@@ -1,12 +1,14 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
+import { existsSync } from "node:fs";
 import {
   listReleases,
   latestRelease,
   cmpVersion,
   groupLabel,
   validateReleases,
+  releaseUrl,
 } from "../src/lib/releases.js";
 
 const data = JSON.parse(
@@ -62,4 +64,24 @@ test("validateReleases rejects malformed data", () => {
 test("empty / missing data degrades safely", () => {
   assert.deepEqual(listReleases(null), []);
   assert.equal(latestRelease({}), null);
+});
+
+test("releaseUrl points at the raw zip in the repo", () => {
+  assert.equal(
+    releaseUrl("releases/v1.2.0.zip"),
+    "https://github.com/lvuCodes/ebay-summer/raw/main/releases/v1.2.0.zip",
+  );
+  assert.equal(releaseUrl(null), null);
+});
+
+// The changelog has twice advertised a zip that was not there: v1.1.1, withdrawn
+// but still linked, and the v1.0.0/v1.1.0 renames to -DEPRECATED. Naming the file
+// is not enough — assert it exists in the repo the link resolves against.
+test("every shipped release links a package that exists in the repo", async () => {
+  for (const r of listReleases(data)) {
+    assert.match(r.package, /^releases\/v.+\.zip$/, `${r.version} package path`);
+    assert.ok(releaseUrl(r.package).startsWith("https://"), `${r.version} url`);
+    const onDisk = new URL(`../../${r.package}`, import.meta.url);
+    assert.ok(existsSync(onDisk), `${r.version} package missing: ${r.package}`);
+  }
 });
