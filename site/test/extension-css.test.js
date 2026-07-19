@@ -13,21 +13,20 @@ const widgetCss = await loadWidgetCss();
 
 const src = (rel) => readFileSync(fileURLToPath(new URL(rel, import.meta.url)), "utf8");
 
+// The trailing delimiter is a lookahead, not a match: consuming it would swallow
+// the space between back-to-back classes in one className, so the second of each
+// pair went unseen — ebay-estimation--lg and both bid-calc field variants were
+// invisible to this guard while appearing to be covered by it.
 function classesIn(text) {
-  return new Set([...text.matchAll(/["'\s](ebay-[a-z0-9-]+(?:__[a-z0-9-]+)?(?:--[a-z0-9-]+)?)["'\s]/g)].map((m) => m[1]));
+  return new Set([...text.matchAll(/["'\s](ebay-[a-z0-9-]+(?:__[a-z0-9-]+)?(?:--[a-z0-9-]+)?)(?=["'\s])/g)].map((m) => m[1]));
 }
 
-test("DEMO_CLASSES covers every class the demo markup renders", () => {
-  const rendered = classesIn(src("../src/components/DemoWidgets.jsx"));
-  const missing = [...rendered].filter((c) => !DEMO_CLASSES.has(c));
-  assert.deepEqual(missing, [], `DemoWidgets.jsx renders classes absent from DEMO_CLASSES: ${missing}`);
-});
-
-test("DEMO_CLASSES covers every class the controller toggles at runtime", () => {
-  const toggled = classesIn(src("../src/components/demo-controller.js"));
-  const missing = [...toggled].filter((c) => !DEMO_CLASSES.has(c));
-  assert.deepEqual(missing, [], `demo-controller.js toggles classes absent from DEMO_CLASSES: ${missing}`);
-});
+for (const file of ["DemoWidgets.jsx", "demo-controller.js"]) {
+  test(`DEMO_CLASSES covers every class ${file} names`, () => {
+    const missing = [...classesIn(src(`../src/components/${file}`))].filter((c) => !DEMO_CLASSES.has(c));
+    assert.deepEqual(missing, [], `${file} names classes absent from DEMO_CLASSES: ${missing}`);
+  });
+}
 
 test("filter keeps selectors whose classes the demo produces", () => {
   const css = ".ebay-estimation { color: red } .ebay-estimation__amount { font-size: 1rem }";
@@ -46,6 +45,33 @@ test("filter keeps the usable half of a comma-separated selector list", () => {
   const out = filterToDemoClasses(css);
   assert.match(out, /^\.ebay-estimation__main \{/);
   assert.doesNotMatch(out, /--wide/);
+});
+
+// The extension stylesheets are commented, and a comment body can hold braces
+// and class names — left in, it would be parsed as a rule and its classes would
+// decide whether a real selector survives the filter.
+test("filter strips comments before splitting into rules", () => {
+  const css = "/* .vi-grid { x } */ .ebay-estimation { color: red }";
+  assert.equal(filterToDemoClasses(css), ".ebay-estimation { color: red }");
+});
+
+test("filter drops empty rules and trailing text outside any block", () => {
+  assert.equal(filterToDemoClasses(".ebay-estimation { }"), "");
+  assert.equal(filterToDemoClasses(".ebay-estimation"), "");
+});
+
+// Relies on the ESM registry having already cached both stylesheet imports, so
+// the re-import inside loadWidgetCss is a no-op and cannot repopulate ES. If the
+// plugin ever gains a cachebusting import to fix dev-server staleness, this test
+// starts passing for the wrong reason and needs rewriting against a stub.
+test("loadWidgetCss reports a stylesheet that failed to populate globalThis.ES", async () => {
+  const saved = globalThis.ES;
+  delete globalThis.ES;
+  try {
+    await assert.rejects(loadWidgetCss(), /did not populate globalThis\.ES/);
+  } finally {
+    globalThis.ES = saved;
+  }
 });
 
 test("the built stylesheet is layered, !important-free, and non-empty", () => {
