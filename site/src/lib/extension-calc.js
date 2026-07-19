@@ -24,4 +24,6 @@ export const {
   clampCount,
   evalExpr,
   bidCalcInput,
+  bidCalcParts,
+  bidFromTotalParts,
 } = ES;
