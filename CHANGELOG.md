@@ -2,25 +2,31 @@
 
 All notable changes to eBay Σummer. Versions follow the extension's `manifest.json` version, and each release is packaged as a zip under [releases/](releases/).
 
-## [1.1.1] — 2026-07-18
+## [1.2.0] — 2026-07-18
 
-Restores the estimated total box on search results, which eBay's July 2026 card reskin had silently disabled.
+Restores the estimated total box on search results, which eBay's July 2026 card reskin had silently disabled, and rebuilds the popup so a packaged build ships only the features it actually contains. Supersedes the withdrawn 1.1.1 package; the fixes drafted for it ship here for the first time.
 
 ### Fixed
 
 - **Estimated total box on search results.** eBay renamed the search-result card markup — `.su-item-card` became `.s-card`, its price moved from `.su-item-card__price-container` into a `.s-card__attribute-row`, and the card's own header element was dropped. The old class names matched nothing, so no boxes were drawn on search. Both the old and the reskinned markup are now matched, so pages still serving the old layout keep the box exactly where it was.
 - **Understated totals on price ranges.** The reskin splits a range across three separate elements (`$10.75` · ` to ` · `$30.93`) where the old markup held it in one, so only the low end was read and the estimate ignored the top of the range — on the 18 July capture, 21 of 250 results. The range is now reassembled from the price's own attribute row, which leaves an auction card's separate Buy It Now price out of it.
 - **Related-item carousels on listing pages.** These carry search-style cards and take the same fixes.
+- **Popup half-initialized on open.** A packaged build excluded unreleased features from `src/`, but `popup.html` still loaded their scripts, so the first emoji select threw and the radios, text inputs, and collapse states were never populated. Each feature now registers its own popup section, so dropping a feature's scripts drops its markup, its controls, and its wiring together. This is what withdrew the 1.1.1 package.
+- **Popup footer reported the wrong version.** It read a hardcoded string — claiming `v1.0.0-dev` on a 1.1.1 build — and now reads `chrome.runtime.getManifest()`.
+- **Notification icon on the "auction ended" badge.** The fallback icon was a path relative to the service worker rather than an extension URL; it now resolves through `chrome.runtime.getURL()`.
+- **"Auction ended" badge could erase itself.** The sweep that clears stale "ending in Ns" badges shared an id prefix with the persistent "ended" badge, so clearing raced the create that was about to replace it. The badge being re-created is now left for `create()` to replace in place.
+- **Clicking a badge whose tab or window had closed failed silently.** The failure landed in an unchecked `runtime.lastError`; it now warns to the service worker console.
 
 ### Changed
 
 - **Ranged totals are italicised**, matching how eBay spells a ranged price on its own cards. This is independent of the "Warn on ranged items" toggle, which still owns the 🚦 flag.
+- **The popup is assembled from per-feature components** rather than one monolithic `popup.html` and a flat set of control tables. Behaviour is unchanged; every in-scope control renders as before.
 
 ### Known Issues
 
-- Recently viewed does not draw boxes — eBay's markup moved there too, and no capture is on hand to pin the new selectors. Its toggle is hidden for this release rather than offering a switch that does nothing; the setting itself is untouched, so turning it back on later restores whatever was set.
+- Recently viewed does not draw boxes — this was a defect missed in the v1.0.0 release. Its toggle is hidden for this release rather than offering a switch that does nothing; the setting itself is untouched, so turning it back on later restores whatever was set.
 
-Package: [`releases/v1.1.1.zip`](releases/v1.1.1.zip)
+Package: [`releases/v1.2.0.zip`](releases/v1.2.0.zip)
 
 ## [1.1.0] — 2026-07-13
 
@@ -35,7 +41,7 @@ Fixes the bid calculator's injection into eBay's redesigned Best-Offer "Make off
 
 - The legacy seller-initiated-offer path is kept as a fallback; the cross-origin review step is left to eBay's own total.
 
-Package: [`releases/v1.1.0.zip`](releases/v1.1.0.zip)
+Package: [`releases/v1.1.0-DEPRECATED.zip`](releases/v1.1.0-DEPRECATED.zip)
 
 ## [1.0.0] — 2026-07-12
 
@@ -51,4 +57,4 @@ Initial standalone release — the landed-cost calculator and auction alerts, sp
 - **Ranges & currencies.** Multi-variation price ranges and non-US-currency listings both compute correctly from the US figures eBay shows.
 - **Popup settings.** Tune the tax rate, shipping-flag thresholds, per-page toggles, and auction alerts from the toolbar popup — every field takes effect on open eBay tabs live.
 
-Package: [`releases/v1.0.0.zip`](releases/v1.0.0.zip)
+Package: [`releases/v1.0.0-DEPRECATED.zip`](releases/v1.0.0-DEPRECATED.zip)
