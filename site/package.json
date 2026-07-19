@@ -9,14 +9,15 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node --test \"test/*.test.js\""
+    "test": "node --test \"test/*.test.js\"",
+    "test:coverage": "node --test --experimental-test-coverage --test-coverage-exclude=\"../src/**\" --test-coverage-exclude=\"../test/**\" --test-coverage-lines=95 --test-coverage-branches=92 --test-coverage-functions=95 \"test/*.test.js\""
   },
   "dependencies": {
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^4.3.4",
-    "vite": "^5.4.11"
+    "@vitejs/plugin-react": "^6.0.3",
+    "vite": "^8.1.5"
   }
 }

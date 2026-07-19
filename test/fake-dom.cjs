@@ -3,10 +3,19 @@
 // subset of the DOM the src/ render modules actually use — element trees, a real
 // CSS-selector engine (tag / .class / #id / [attr op val i] / :not / descendant /
 // comma / universal), classList, dataset, style.setProperty, textContent, the
-// insertion/removal methods, closest/matches/contains, and event
-// listen+dispatch. Selector matching is genuine so the modules' idempotency
+// insertion/removal methods, the attribute methods (including toggleAttribute),
+// closest/matches/contains, and event listen+dispatch. focus() is a call
+// recorder only — it sets el._focused rather than modelling activeElement,
+// since elements here have no owning document. Selector matching is genuine so
+// the modules' idempotency
 // guards ([data-ebay-total], .ebay-estimation--lg:not(--bin), …) behave as they
 // do in a browser. globalThis.document is swapped per test via makeDoc().
+//
+// The .cjs extension is deliberate: site/ is a separate ESM package ("type":
+// "module") that loads this file across the package boundary via createRequire.
+// A plain .js here would be reinterpreted as ESM the day the root package gains
+// a "type" field, and module.exports below would throw — in the site CI job,
+// with nothing in site/ having changed. The extension pins the CJS loader.
 
 // --- Selector engine -------------------------------------------------------
 
@@ -255,6 +264,15 @@ class Element {
   }
   removeAttribute(name) {
     delete this._attrs[name];
+  }
+  toggleAttribute(name, force) {
+    const want = force === undefined ? !this.hasAttribute(name) : !!force;
+    if (want) this.setAttribute(name, "");
+    else this.removeAttribute(name);
+    return want;
+  }
+  focus() {
+    this._focused = true;
   }
 
   // --- tree navigation ---
@@ -519,11 +537,14 @@ class FakeDocument {
 
 // --- helpers ---------------------------------------------------------------
 
-// Build a small element with optional { class, id, attrs, text, html, children }.
+// Build a small element with optional { class, id, attrs, value, text, html,
+// children }. `value` is a plain property, matching the DOM's form-control
+// value (which is not an attribute).
 function el(tag, opts = {}) {
   const e = new Element(tag);
   if (opts.class) e.className = opts.class;
   if (opts.id) e.id = opts.id;
+  if (opts.value != null) e.value = opts.value;
   if (opts.attrs) Object.keys(opts.attrs).forEach((k) => e.setAttribute(k, opts.attrs[k]));
   if (opts.text != null) e.textContent = opts.text;
   if (opts.html != null) e.innerHTML = opts.html;
