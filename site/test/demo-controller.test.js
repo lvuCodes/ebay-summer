@@ -45,8 +45,13 @@ function fixture({ item = "49.24", ship = "0", tax = "0.0825" } = {}) {
     ],
   });
 
+  // The placeholders match DemoWidgets.jsx: the bid one is captured at init and
+  // restored after a below-shipping warning, so a bare fixture would not catch a
+  // regression in that round-trip.
   const bidIn = input("ebay-bid-calc__input");
+  bidIn.setAttribute("placeholder", "bid or =2*4");
   const totIn = input("ebay-bid-calc__total");
+  totIn.setAttribute("placeholder", "target total");
   const calcEl = el("span", { class: "ebay-bid-calc__calc", attrs: { hidden: "" } });
   const totalCalcEl = el("span", { class: "ebay-bid-calc__total-calc", attrs: { hidden: "" } });
   const bidPerEl = el("span", { class: "ebay-bid-calc__perunit", attrs: { hidden: "" } });
@@ -128,7 +133,11 @@ test("every selector the controller queries exists in DemoWidgets.jsx", () => {
 
   for (const sel of new Set(selectors)) {
     const cls = sel.replace(/^\./, "");
-    assert.ok(widgets.includes(cls), `DemoWidgets.jsx no longer renders "${sel}", which demo-controller.js queries`);
+    // Whole-token match, not a substring: "ebay-estimation__step" occurs inside
+    // "ebay-estimation__stepper", so a plain includes() would keep passing after
+    // the step buttons were deleted and the stepper wrapper left behind.
+    const present = new RegExp(`(?<![\\w-])${cls}(?![\\w-])`).test(widgets);
+    assert.ok(present, `DemoWidgets.jsx no longer renders "${sel}", which demo-controller.js queries`);
   }
 });
 
@@ -293,6 +302,40 @@ test("total input: a =formula echoes on the total side only", () => {
   assert.equal(f.calcEl.hasAttribute("hidden"), true);
   assert.equal(f.bidIn.value, "15.00");
   assert.equal(f.totalField.classList.contains("ebay-bid-calc__field--formula"), true);
+});
+
+// A target below shipping is refused, not calculated. The formula echo stays
+// hidden even though "=2+3" parses fine: echoing "= $5.00" would present a
+// resolved value for an input that yields no bid. Mirrors bid-calc.js:151-167.
+test("total input: a =formula below the shipping cost is refused, not echoed", () => {
+  const f = mount({ item: "100", ship: "10", tax: "0.10" });
+  f.totIn.value = "=2+3";
+  f.totIn.dispatch("input");
+  assert.equal(f.totalCalcEl.hasAttribute("hidden"), true);
+  assert.equal(f.bidIn.value, "");
+  assert.equal(f.bidSubEl.textContent, "target below $10.00 shipping");
+});
+
+test("total input: a below-shipping target warns on both fields", () => {
+  const f = mount({ item: "100", ship: "10", tax: "0.10" });
+  f.totIn.value = "5";
+  f.totIn.dispatch("input");
+  assert.equal(f.bidIn.getAttribute("placeholder"), "⚠️ target ≤ shipping");
+  assert.equal(f.bidIn.classList.contains("ebay-bid-calc__field--warn"), true);
+  assert.equal(f.totIn.classList.contains("ebay-bid-calc__field--warn"), true);
+  assert.equal(f.totIn.classList.contains("ebay-bid-calc__field--invalid"), true);
+});
+
+test("total input: a workable target clears the warning and restores the hint", () => {
+  const f = mount({ item: "100", ship: "10", tax: "0.10" });
+  f.totIn.value = "5";
+  f.totIn.dispatch("input");
+  f.totIn.value = "65";
+  f.totIn.dispatch("input");
+  assert.equal(f.bidIn.getAttribute("placeholder"), "bid or =2*4");
+  assert.equal(f.bidIn.classList.contains("ebay-bid-calc__field--warn"), false);
+  assert.equal(f.totIn.classList.contains("ebay-bid-calc__field--warn"), false);
+  assert.equal(f.bidIn.value, "50.00");
 });
 
 test("total input: unparseable text invalidates the total and clears the bid", () => {
