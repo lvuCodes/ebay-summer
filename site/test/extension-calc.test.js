@@ -8,7 +8,17 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import * as calc from "../src/lib/extension-calc.js";
 
-const REQUIRED = ["fmtMoney", "pctText", "calcTotal", "shipLabel", "clampCount", "evalExpr", "bidCalcInput"];
+const REQUIRED = [
+  "fmtMoney",
+  "pctText",
+  "calcTotal",
+  "shipLabel",
+  "clampCount",
+  "evalExpr",
+  "bidCalcInput",
+  "bidCalcParts",
+  "bidFromTotalParts",
+];
 
 test("bridge: every binding demo-controller.js imports resolves to a function", () => {
   for (const name of REQUIRED) {
