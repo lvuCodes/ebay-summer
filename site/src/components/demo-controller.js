@@ -8,9 +8,11 @@ import {
   calcTotal,
   shipLabel,
   clampCount,
-  bidCalcInput,
+  parseCount,
+  perUnitText,
   bidCalcParts,
   bidFromTotalParts,
+  bidPerUnitText,
 } from "../lib/extension-calc.js";
 
 export function initDemo(box, calc) {
@@ -45,7 +47,7 @@ export function initDemo(box, calc) {
   function renderPanel() {
     const basis = includeShip ? base.total : totalNoShip;
     const note = hasShip ? (includeShip ? " (incl. ship)" : " (excl. ship)") : "";
-    perEl.textContent = count + " @ $" + fmtMoney(basis / count) + "/unit" + note;
+    perEl.textContent = perUnitText(basis, null, count) + note;
   }
   function activate() { perUnitActive = true; renderBidPerUnit(); }
   function commitCount(n) {
@@ -61,14 +63,14 @@ export function initDemo(box, calc) {
     if (willOpen) { renderPanel(); activate(); }
   });
   on(countEl, "input", function () {
-    count = clampCount(bidCalcInput(countEl.value).value);
+    count = parseCount(countEl.value);
     renderPanel(); activate();
   });
-  on(countEl, "change", function () { commitCount(bidCalcInput(countEl.value).value); });
-  on(countEl, "blur", function () { commitCount(bidCalcInput(countEl.value).value); });
+  on(countEl, "change", function () { commitCount(parseCount(countEl.value)); });
+  on(countEl, "blur", function () { commitCount(parseCount(countEl.value)); });
   box.querySelectorAll(".ebay-estimation__step").forEach(function (btn) {
     on(btn, "click", function () {
-      commitCount(clampCount(bidCalcInput(countEl.value).value) + Number(btn.getAttribute("data-step")));
+      commitCount(parseCount(countEl.value) + Number(btn.getAttribute("data-step")));
     });
   });
   on(shipBtn, "click", function () {
@@ -87,6 +89,7 @@ export function initDemo(box, calc) {
   const bidPerEl = calc.querySelector(".ebay-bid-calc__perunit");
   const bidSubEl = calc.querySelector(".ebay-bid-calc__sub");
   let lastTotal = null, lastTotalNoShip = null, lastValid = false;
+  const BID_PLACEHOLDER = bidIn.getAttribute("placeholder");
 
   function syncDollar() {
     bidField.classList.toggle("ebay-bid-calc__field--formula", bidIn.value.trim()[0] === "=");
@@ -94,8 +97,7 @@ export function initDemo(box, calc) {
   }
   function renderBidPerUnit() {
     if (lastValid && perUnitActive) {
-      const basis = includeShip ? lastTotal : lastTotalNoShip;
-      bidPerEl.textContent = "($" + fmtMoney(basis / count) + "/unit)";
+      bidPerEl.textContent = "(" + bidPerUnitText(lastTotal, lastTotalNoShip, includeShip, count) + ")";
       bidPerEl.removeAttribute("hidden");
     } else bidPerEl.setAttribute("hidden", "");
   }
@@ -119,12 +121,9 @@ export function initDemo(box, calc) {
   function fromTotal() {
     const p = bidFromTotalParts(totIn.value, SHIP, TAX);
     const typed = totIn.value.trim() !== "";
-    // A target that can't cover shipping parses fine but yields no usable bid, so
-    // it clears the bid field without flagging the total as malformed input.
-    const parsed = p.value != null;
     calcEl.setAttribute("hidden", "");
-    if (p.isFunction && parsed) {
-      totalCalcEl.textContent = "= " + (p.calcText || "$" + fmtMoney(p.value));
+    if (p.isFunction && p.valid) {
+      totalCalcEl.textContent = "= " + p.calcText;
       totalCalcEl.removeAttribute("hidden");
     } else totalCalcEl.setAttribute("hidden", "");
     if (p.valid) {
@@ -134,7 +133,14 @@ export function initDemo(box, calc) {
       bidIn.value = ""; lastValid = false;
     }
     bidSubEl.textContent = p.sub;
-    totIn.classList.toggle("ebay-bid-calc__field--invalid", typed && !parsed);
+    // A target below shipping is refused, not calculated: the bid field is blank,
+    // so its placeholder carries the warning. Mirrors bid-calc.js exactly — the
+    // demo showing a resolved "= $5.00" for an input the extension rejects would
+    // advertise behavior the extension does not have.
+    bidIn.setAttribute("placeholder", p.belowShipping ? "⚠️ target ≤ shipping" : BID_PLACEHOLDER);
+    bidIn.classList.toggle("ebay-bid-calc__field--warn", !!p.belowShipping);
+    totIn.classList.toggle("ebay-bid-calc__field--warn", !!p.belowShipping);
+    totIn.classList.toggle("ebay-bid-calc__field--invalid", typed && !p.valid);
     bidIn.classList.remove("ebay-bid-calc__field--invalid");
     renderBidPerUnit(); syncDollar();
   }

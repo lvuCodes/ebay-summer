@@ -10,7 +10,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "node --test \"test/*.test.js\"",
-    "test:coverage": "node --test --experimental-test-coverage --test-coverage-exclude=\"../src/**\" --test-coverage-exclude=\"../test/**\" --test-coverage-lines=95 --test-coverage-branches=92 --test-coverage-functions=95 \"test/*.test.js\""
+    "test:coverage": "node --test --experimental-test-coverage --test-coverage-exclude=\"../src/**\" --test-coverage-exclude=\"../test/**\" --test-coverage-lines=98 --test-coverage-branches=94 --test-coverage-functions=95 \"test/*.test.js\""
   },
   "dependencies": {
     "react": "^18.3.1",
