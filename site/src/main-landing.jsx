@@ -4,6 +4,10 @@ import Landing from "./pages/Landing.jsx";
 import { validateReleases } from "./lib/releases.js";
 import releasesData from "./data/releases.json";
 import "./styles/base.css";
+// The extension's own widget rules, extracted at build time. Imported BEFORE
+// index.css only for readability — it sits in @layer extension, so index.css
+// overrides it on cascade layer regardless of order.
+import "virtual:extension-widget-css.css";
 import "./styles/index.css";
 
 // Fail loudly at bootstrap if the bundled releases data is malformed, rather than
