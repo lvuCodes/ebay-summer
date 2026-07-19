@@ -21,19 +21,35 @@ function loadWorker(existing = {}, lastError = null) {
   let onMessage = null;
   let onClicked = null;
 
-  // windows/tabs.update invoke their callback the way Chrome does, with
-  // runtime.lastError set when the target is gone, so the failure path is real.
+  // A window and a tab fail independently — the window can be gone while the tab
+  // survives — so `lastError` takes either one error for both or {windows, tabs}.
+  const gone =
+    lastError && !lastError.message ? lastError : { windows: lastError, tabs: lastError };
+
+  const runtime = {
+    getURL: (path) => EXT_ORIGIN + path,
+    onMessage: { addListener: (fn) => (onMessage = fn) },
+  };
+
+  // Chrome exposes runtime.lastError ONLY for the duration of the callback and
+  // deletes it afterwards, which is why warnIfGone has to read it from inside
+  // the closure. Setting it once at construction would let a read hoisted out of
+  // the closure pass here while never seeing an error in a real browser, so the
+  // stub sets and deletes it around each cb() the way Chrome does.
   const update = (bucket) => (id, opts, cb) => {
     calls[bucket].push({ id, opts });
-    if (cb) cb();
+    if (!cb) return;
+    const err = gone[bucket];
+    if (err) runtime.lastError = err;
+    try {
+      cb();
+    } finally {
+      delete runtime.lastError;
+    }
   };
 
   globalThis.chrome = {
-    runtime: {
-      getURL: (path) => EXT_ORIGIN + path,
-      onMessage: { addListener: (fn) => (onMessage = fn) },
-      lastError,
-    },
+    runtime,
     notifications: {
       create: (id, opts) => calls.created.push({ id, opts }),
       clear: (id) => calls.cleared.push(id),
@@ -138,6 +154,17 @@ test("auction-ended leaves a persistent ended badge only when opted in", () => {
   assert.equal(id, "ebay|7|3|ended");
   assert.equal(opts.title, "Auction ended");
   assert.equal(opts.message, "Rare card");
+  // The ended badge takes the same root-anchored fallback as the ending-soon
+  // one. Asserted here too because every iconFor test above sends "ending-soon",
+  // which leaves this call site free to regress to a worker-relative path.
+  assert.equal(opts.iconUrl, BUNDLED_ICON);
+});
+
+test("the ended badge keeps the listing photo when one is supplied", () => {
+  const w = loadWorker();
+  const photo = "https://i.ebayimg.com/images/g/abc/s-l500.jpg";
+  w.send({ type: "auction-ended", persistent: true, iconUrl: photo }, SENDER);
+  assert.equal(w.calls.created[0].opts.iconUrl, photo);
 });
 
 test("the ended badge falls back to generic copy when the title is missing", () => {
@@ -209,14 +236,28 @@ test("clicking the persistent ended badge still focuses the tab", () => {
 });
 
 test("a click on a closed tab surfaces the failure instead of swallowing it", () => {
-  const w = loadWorker({}, { message: "No tab with id: 7." });
+  const w = loadWorker({}, {
+    windows: { message: "No window with id: 3." },
+    tabs: { message: "No tab with id: 7." },
+  });
   w.click("ebay|7|3|ended");
 
   assert.equal(w.calls.warned.length, 2); // one per update call
-  assert.match(w.calls.warned[0], /could not focus window 3 — No tab with id: 7\./);
+  assert.match(w.calls.warned[0], /could not focus window 3 — No window with id: 3\./);
   assert.match(w.calls.warned[1], /could not focus tab 7 — No tab with id: 7\./);
   // The badge still goes away — a dead tab should not leave it stuck.
   assert.deepEqual(w.calls.cleared, ["ebay|7|3|ended"]);
+});
+
+// The window and the tab report independently: a window closed out from under a
+// tab that Chrome re-homed warns once, not twice. A stub holding one lastError
+// for the whole click cannot tell this apart from a total failure.
+test("a click warns only about the target that is actually gone", () => {
+  const w = loadWorker({}, { windows: { message: "No window with id: 3." }, tabs: null });
+  w.click("ebay|7|3|ended");
+
+  assert.equal(w.calls.warned.length, 1);
+  assert.match(w.calls.warned[0], /could not focus window 3/);
 });
 
 test("a successful click warns about nothing", () => {

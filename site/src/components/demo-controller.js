@@ -2,7 +2,18 @@
 // root elements, and returns a teardown fn for React's useEffect cleanup. A thin
 // DOM shell — all the math (evalExpr, calcTotal, per-unit, bidirectional
 // bid<->total) is the extension's own, bridged in via ../lib/extension-calc.js.
-import { fmtMoney, pctText, calcTotal, shipLabel, clampCount, bidCalcInput } from "../lib/extension-calc.js";
+import {
+  fmtMoney,
+  pctText,
+  calcTotal,
+  shipLabel,
+  clampCount,
+  parseCount,
+  perUnitText,
+  bidCalcParts,
+  bidFromTotalParts,
+  bidPerUnitText,
+} from "../lib/extension-calc.js";
 
 export function initDemo(box, calc) {
   if (!box || !calc) return () => {};
@@ -36,7 +47,7 @@ export function initDemo(box, calc) {
   function renderPanel() {
     const basis = includeShip ? base.total : totalNoShip;
     const note = hasShip ? (includeShip ? " (incl. ship)" : " (excl. ship)") : "";
-    perEl.textContent = count + " @ $" + fmtMoney(basis / count) + "/unit" + note;
+    perEl.textContent = perUnitText(basis, null, count) + note;
   }
   function activate() { perUnitActive = true; renderBidPerUnit(); }
   function commitCount(n) {
@@ -52,14 +63,14 @@ export function initDemo(box, calc) {
     if (willOpen) { renderPanel(); activate(); }
   });
   on(countEl, "input", function () {
-    count = clampCount(bidCalcInput(countEl.value).value);
+    count = parseCount(countEl.value);
     renderPanel(); activate();
   });
-  on(countEl, "change", function () { commitCount(bidCalcInput(countEl.value).value); });
-  on(countEl, "blur", function () { commitCount(bidCalcInput(countEl.value).value); });
+  on(countEl, "change", function () { commitCount(parseCount(countEl.value)); });
+  on(countEl, "blur", function () { commitCount(parseCount(countEl.value)); });
   box.querySelectorAll(".ebay-estimation__step").forEach(function (btn) {
     on(btn, "click", function () {
-      commitCount(clampCount(bidCalcInput(countEl.value).value) + Number(btn.getAttribute("data-step")));
+      commitCount(parseCount(countEl.value) + Number(btn.getAttribute("data-step")));
     });
   });
   on(shipBtn, "click", function () {
@@ -78,6 +89,7 @@ export function initDemo(box, calc) {
   const bidPerEl = calc.querySelector(".ebay-bid-calc__perunit");
   const bidSubEl = calc.querySelector(".ebay-bid-calc__sub");
   let lastTotal = null, lastTotalNoShip = null, lastValid = false;
+  const BID_PLACEHOLDER = bidIn.getAttribute("placeholder");
 
   function syncDollar() {
     bidField.classList.toggle("ebay-bid-calc__field--formula", bidIn.value.trim()[0] === "=");
@@ -85,50 +97,50 @@ export function initDemo(box, calc) {
   }
   function renderBidPerUnit() {
     if (lastValid && perUnitActive) {
-      const basis = includeShip ? lastTotal : lastTotalNoShip;
-      bidPerEl.textContent = "($" + fmtMoney(basis / count) + "/unit)";
+      bidPerEl.textContent = "(" + bidPerUnitText(lastTotal, lastTotalNoShip, includeShip, count) + ")";
       bidPerEl.removeAttribute("hidden");
     } else bidPerEl.setAttribute("hidden", "");
   }
   function fromBid() {
-    const r = bidCalcInput(bidIn.value);
+    const p = bidCalcParts(bidIn.value, SHIP, TAX);
     const typed = bidIn.value.trim() !== "";
-    const valid = r.value != null && Number.isFinite(r.value) && r.value >= 0;
-    if (r.isFunction && valid) { calcEl.textContent = "= $" + fmtMoney(r.value); calcEl.removeAttribute("hidden"); }
+    if (p.isFunction && p.valid) { calcEl.textContent = "= " + p.calcText; calcEl.removeAttribute("hidden"); }
     else calcEl.setAttribute("hidden", "");
     totalCalcEl.setAttribute("hidden", "");
-    if (valid) {
-      const c = calcTotal(r.value, SHIP, TAX);
-      totIn.value = c.total.toFixed(2);
-      lastTotal = c.total; lastTotalNoShip = r.value + c.tax; lastValid = true;
-      bidSubEl.textContent = "incl. " + pct + " tax ($" + fmtMoney(c.tax) + ") " + shipLabel(SHIP);
+    if (p.valid) {
+      totIn.value = p.total.toFixed(2);
+      lastTotal = p.total; lastTotalNoShip = p.totalNoShip; lastValid = true;
     } else {
       totIn.value = ""; lastValid = false;
-      bidSubEl.textContent = "incl. " + pct + " tax " + shipLabel(SHIP);
     }
-    bidIn.classList.toggle("ebay-bid-calc__field--invalid", typed && !valid);
+    bidSubEl.textContent = p.sub;
+    bidIn.classList.toggle("ebay-bid-calc__field--invalid", typed && !p.valid);
     totIn.classList.remove("ebay-bid-calc__field--invalid");
     renderBidPerUnit(); syncDollar();
   }
   function fromTotal() {
-    const r = bidCalcInput(totIn.value);
+    const p = bidFromTotalParts(totIn.value, SHIP, TAX);
     const typed = totIn.value.trim() !== "";
-    const valid = r.value != null && Number.isFinite(r.value) && r.value >= 0;
-    const ship = SHIP || 0;
-    const bid = valid ? (r.value - ship) / (1 + TAX) : null;
-    const below = valid && bid < 0;
     calcEl.setAttribute("hidden", "");
-    if (r.isFunction && valid) { totalCalcEl.textContent = "= $" + fmtMoney(r.value); totalCalcEl.removeAttribute("hidden"); }
-    else totalCalcEl.setAttribute("hidden", "");
-    if (valid && !below) {
-      bidIn.value = bid.toFixed(2);
-      lastTotal = r.value; lastTotalNoShip = r.value - ship; lastValid = true;
-      bidSubEl.textContent = "incl. " + pct + " tax ($" + fmtMoney(bid * TAX) + ") " + shipLabel(SHIP);
+    if (p.isFunction && p.valid) {
+      totalCalcEl.textContent = "= " + p.calcText;
+      totalCalcEl.removeAttribute("hidden");
+    } else totalCalcEl.setAttribute("hidden", "");
+    if (p.valid) {
+      bidIn.value = p.bid.toFixed(2);
+      lastTotal = p.total; lastTotalNoShip = p.totalNoShip; lastValid = true;
     } else {
       bidIn.value = ""; lastValid = false;
-      bidSubEl.textContent = below ? "target below $" + fmtMoney(ship) + " shipping" : "incl. " + pct + " tax " + shipLabel(SHIP);
     }
-    totIn.classList.toggle("ebay-bid-calc__field--invalid", typed && !valid);
+    bidSubEl.textContent = p.sub;
+    // A target below shipping is refused, not calculated: the bid field is blank,
+    // so its placeholder carries the warning. Mirrors bid-calc.js exactly — the
+    // demo showing a resolved "= $5.00" for an input the extension rejects would
+    // advertise behavior the extension does not have.
+    bidIn.setAttribute("placeholder", p.belowShipping ? "⚠️ target ≤ shipping" : BID_PLACEHOLDER);
+    bidIn.classList.toggle("ebay-bid-calc__field--warn", !!p.belowShipping);
+    totIn.classList.toggle("ebay-bid-calc__field--warn", !!p.belowShipping);
+    totIn.classList.toggle("ebay-bid-calc__field--invalid", typed && !p.valid);
     bidIn.classList.remove("ebay-bid-calc__field--invalid");
     renderBidPerUnit(); syncDollar();
   }
