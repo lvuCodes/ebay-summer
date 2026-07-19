@@ -2,7 +2,16 @@
 // root elements, and returns a teardown fn for React's useEffect cleanup. A thin
 // DOM shell — all the math (evalExpr, calcTotal, per-unit, bidirectional
 // bid<->total) is the extension's own, bridged in via ../lib/extension-calc.js.
-import { fmtMoney, pctText, calcTotal, shipLabel, clampCount, bidCalcInput } from "../lib/extension-calc.js";
+import {
+  fmtMoney,
+  pctText,
+  calcTotal,
+  shipLabel,
+  clampCount,
+  bidCalcInput,
+  bidCalcParts,
+  bidFromTotalParts,
+} from "../lib/extension-calc.js";
 
 export function initDemo(box, calc) {
   if (!box || !calc) return () => {};
@@ -91,44 +100,41 @@ export function initDemo(box, calc) {
     } else bidPerEl.setAttribute("hidden", "");
   }
   function fromBid() {
-    const r = bidCalcInput(bidIn.value);
+    const p = bidCalcParts(bidIn.value, SHIP, TAX);
     const typed = bidIn.value.trim() !== "";
-    const valid = r.value != null && Number.isFinite(r.value) && r.value >= 0;
-    if (r.isFunction && valid) { calcEl.textContent = "= $" + fmtMoney(r.value); calcEl.removeAttribute("hidden"); }
+    if (p.isFunction && p.valid) { calcEl.textContent = "= " + p.calcText; calcEl.removeAttribute("hidden"); }
     else calcEl.setAttribute("hidden", "");
     totalCalcEl.setAttribute("hidden", "");
-    if (valid) {
-      const c = calcTotal(r.value, SHIP, TAX);
-      totIn.value = c.total.toFixed(2);
-      lastTotal = c.total; lastTotalNoShip = r.value + c.tax; lastValid = true;
-      bidSubEl.textContent = "incl. " + pct + " tax ($" + fmtMoney(c.tax) + ") " + shipLabel(SHIP);
+    if (p.valid) {
+      totIn.value = p.total.toFixed(2);
+      lastTotal = p.total; lastTotalNoShip = p.totalNoShip; lastValid = true;
     } else {
       totIn.value = ""; lastValid = false;
-      bidSubEl.textContent = "incl. " + pct + " tax " + shipLabel(SHIP);
     }
-    bidIn.classList.toggle("ebay-bid-calc__field--invalid", typed && !valid);
+    bidSubEl.textContent = p.sub;
+    bidIn.classList.toggle("ebay-bid-calc__field--invalid", typed && !p.valid);
     totIn.classList.remove("ebay-bid-calc__field--invalid");
     renderBidPerUnit(); syncDollar();
   }
   function fromTotal() {
-    const r = bidCalcInput(totIn.value);
+    const p = bidFromTotalParts(totIn.value, SHIP, TAX);
     const typed = totIn.value.trim() !== "";
-    const valid = r.value != null && Number.isFinite(r.value) && r.value >= 0;
-    const ship = SHIP || 0;
-    const bid = valid ? (r.value - ship) / (1 + TAX) : null;
-    const below = valid && bid < 0;
+    // A target that can't cover shipping parses fine but yields no usable bid, so
+    // it clears the bid field without flagging the total as malformed input.
+    const parsed = p.value != null;
     calcEl.setAttribute("hidden", "");
-    if (r.isFunction && valid) { totalCalcEl.textContent = "= $" + fmtMoney(r.value); totalCalcEl.removeAttribute("hidden"); }
-    else totalCalcEl.setAttribute("hidden", "");
-    if (valid && !below) {
-      bidIn.value = bid.toFixed(2);
-      lastTotal = r.value; lastTotalNoShip = r.value - ship; lastValid = true;
-      bidSubEl.textContent = "incl. " + pct + " tax ($" + fmtMoney(bid * TAX) + ") " + shipLabel(SHIP);
+    if (p.isFunction && parsed) {
+      totalCalcEl.textContent = "= " + (p.calcText || "$" + fmtMoney(p.value));
+      totalCalcEl.removeAttribute("hidden");
+    } else totalCalcEl.setAttribute("hidden", "");
+    if (p.valid) {
+      bidIn.value = p.bid.toFixed(2);
+      lastTotal = p.total; lastTotalNoShip = p.totalNoShip; lastValid = true;
     } else {
       bidIn.value = ""; lastValid = false;
-      bidSubEl.textContent = below ? "target below $" + fmtMoney(ship) + " shipping" : "incl. " + pct + " tax " + shipLabel(SHIP);
     }
-    totIn.classList.toggle("ebay-bid-calc__field--invalid", typed && !valid);
+    bidSubEl.textContent = p.sub;
+    totIn.classList.toggle("ebay-bid-calc__field--invalid", typed && !parsed);
     bidIn.classList.remove("ebay-bid-calc__field--invalid");
     renderBidPerUnit(); syncDollar();
   }
