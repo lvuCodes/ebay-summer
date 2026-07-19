@@ -64,8 +64,7 @@
           ]
         }
       ],
-      "snapshot": "releases/v1.2.0/",
-      "package": "v1.2.0.zip"
+      "package": "releases/v1.2.0.zip"
     },
     {
       "version": "1.1.0",
@@ -94,8 +93,7 @@
           ]
         }
       ],
-      "snapshot": "releases/v1.1.0/",
-      "package": "v1.1.0-DEPRECATED.zip"
+      "package": "releases/v1.1.0-DEPRECATED.zip"
     },
     {
       "version": "1.0.0",
@@ -136,8 +134,7 @@
           ]
         }
       ],
-      "snapshot": "releases/v1.0.0/",
-      "package": "v1.0.0-DEPRECATED.zip"
+      "package": "releases/v1.0.0-DEPRECATED.zip"
     }
   ]
 }

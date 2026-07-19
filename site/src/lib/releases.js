@@ -2,6 +2,8 @@
 // unit-tested under node:test and reused by any future data source (e.g. a
 // GitHub Releases fetch) without touching the render layer.
 
+import { REPO_URL } from "./site.js";
+
 export function listReleases(data) {
   const releases = data && Array.isArray(data.releases) ? data.releases : [];
   return releases.slice().sort((a, b) => cmpVersion(b.version, a.version));
@@ -28,6 +30,12 @@ function parseVersion(v) {
       const x = parseInt(n, 10);
       return Number.isFinite(x) ? x : 0;
     });
+}
+
+// The zips live in the repo, not in docs/, so a page-relative href would 404 on
+// Pages. /raw/ serves the bytes as a download rather than GitHub's blob viewer.
+export function releaseUrl(path) {
+  return path ? `${REPO_URL}/raw/main/${path}` : null;
 }
 
 const GROUP_LABELS = {
