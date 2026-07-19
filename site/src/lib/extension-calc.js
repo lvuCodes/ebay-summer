@@ -22,8 +22,11 @@ export const {
   calcTotal,
   shipLabel,
   clampCount,
+  parseCount,
+  perUnitText,
   evalExpr,
   bidCalcInput,
   bidCalcParts,
   bidFromTotalParts,
+  bidPerUnitText,
 } = ES;

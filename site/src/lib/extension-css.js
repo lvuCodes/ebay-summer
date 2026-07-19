@@ -58,6 +58,7 @@ export const DEMO_CLASSES = new Set([
   "ebay-bid-calc__field--total",
   "ebay-bid-calc__field--formula",
   "ebay-bid-calc__field--invalid",
+  "ebay-bid-calc__field--warn",
   "ebay-bid-calc__dollar",
   "ebay-bid-calc__input",
   "ebay-bid-calc__total",
