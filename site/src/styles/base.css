@@ -37,7 +37,7 @@ html {
 }
 
 body {
-  margin: 0;
+  margin: 0 auto;
   font-family: var(--font-sans);
   background:
     radial-gradient(1100px 520px at 50% -10%, color-mix(in srgb, var(--purple) 16%, transparent) 0%, transparent 62%),

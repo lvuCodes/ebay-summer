@@ -4,7 +4,7 @@
 // it never displaces the brand stripe or the header below it.
 export default function BackLink({
   href = "https://lvucodes.github.io",
-  label = "← Home",
+  label = "← lvuCodes",
 }) {
   return (
     <nav className="back-nav">

@@ -13,7 +13,7 @@
 /* ── Hero ── */
 header.hero {
   text-align: center;
-  margin: 44px auto;
+  margin: 44px 16px;
 }
 
 .hero img.logo {
