@@ -1,3 +1,5 @@
+// eBay Σummer. Copyright (C) 2026 lvuCodes. Licensed under GPL-3.0-or-later; see LICENSE.md.
+//
 // Storage → config: sanitize every stored setting into the shared `config`
 // object, plus the one-time legacy-key migrations. Schema-driven: DEFAULTS
 // (defaults.js) is the single key list — boolean keys sanitize via

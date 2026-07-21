@@ -1,3 +1,5 @@
+// eBay Σummer. Copyright (C) 2026 lvuCodes. Licensed under GPL-3.0-or-later; see LICENSE.md.
+//
 // Auction Ending Notification — popup component. Owns its markup, its controls,
 // and its one piece of bespoke wiring (the sound preview button), so the popup
 // shell never names this feature and a build without notifications/ simply has

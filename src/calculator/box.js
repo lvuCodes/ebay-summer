@@ -1,3 +1,5 @@
+// eBay Σummer. Copyright (C) 2026 lvuCodes. Licensed under GPL-3.0-or-later; see LICENSE.md.
+//
 // DOM builder for the purple/amber estimation box (makeBox) and its
 // lazily-built per-unit panel (buildPerUnitPanel). Depends on config (state),
 // the pure calc helpers, and the live-refresh glue in live.js — all pulled from

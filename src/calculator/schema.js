@@ -1,3 +1,5 @@
+// eBay Σummer. Copyright (C) 2026 lvuCodes. Licensed under GPL-3.0-or-later; see LICENSE.md.
+//
 // Estimated Total Calculator — persisted-settings schema. Loaded (before
 // core/defaults.js) in both the content-script bundle and popup.html.
 (function () {

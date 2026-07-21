@@ -1,3 +1,5 @@
+// eBay Σummer. Copyright (C) 2026 lvuCodes. Licensed under GPL-3.0-or-later; see LICENSE.md.
+
 import { useEffect, useRef } from "react";
 import { initDemo } from "./demo-controller.js";
 

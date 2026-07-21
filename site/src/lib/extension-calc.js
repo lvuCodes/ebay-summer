@@ -1,3 +1,5 @@
+// eBay Σummer. Copyright (C) 2026 lvuCodes. Licensed under GPL-3.0-or-later; see LICENSE.md.
+//
 // Bridges the extension's calculator math into the site's ESM world, so the
 // landing-page demo and the shipped extension compute from ONE implementation
 // instead of two hand-synced ports.

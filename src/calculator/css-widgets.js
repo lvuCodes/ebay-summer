@@ -1,3 +1,5 @@
+// eBay Σummer. Copyright (C) 2026 lvuCodes. Licensed under GPL-3.0-or-later; see LICENSE.md.
+//
 // Widget CSS: the orange bid calculator and the Best-Offer modal seatings —
 // the second half of the calculator's static stylesheet (css-box.js holds the
 // box half; feature.js concatenates the two into the calculator's sharedCss

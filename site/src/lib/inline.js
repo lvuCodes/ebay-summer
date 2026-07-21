@@ -1,3 +1,5 @@
+// eBay Σummer. Copyright (C) 2026 lvuCodes. Licensed under GPL-3.0-or-later; see LICENSE.md.
+//
 // Tiny inline tokenizer for changelog item bodies. Supports two markers so the
 // data stays plain JSON rather than HTML: `code` -> <code>, *emphasis* -> <em>.
 // Returns an array of tokens the React layer maps to elements (no dangerous HTML).

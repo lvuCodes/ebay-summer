@@ -1,3 +1,5 @@
+// eBay Σummer. Copyright (C) 2026 lvuCodes. Licensed under GPL-3.0-or-later; see LICENSE.md.
+//
 // Single source of truth for every persisted setting's default value.
 //
 // Loaded in BOTH the content-script list (manifest.json) and popup.html, after

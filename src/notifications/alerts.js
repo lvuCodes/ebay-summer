@@ -1,3 +1,5 @@
+// eBay Σummer. Copyright (C) 2026 lvuCodes. Licensed under GPL-3.0-or-later; see LICENSE.md.
+//
 // Pure auction-alert logic: the countdown parser and the threshold/ending
 // state machine behind notify.js's once-a-second watch. No DOM, no config —
 // every function takes its inputs as arguments, so the whole module is

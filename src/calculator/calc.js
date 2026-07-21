@@ -1,3 +1,5 @@
+// eBay Σummer. Copyright (C) 2026 lvuCodes. Licensed under GPL-3.0-or-later; see LICENSE.md.
+//
 // Pure calculation + parsing core of the Estimated Total Calculator. No DOM,
 // no config — every function takes its inputs as arguments, so the whole
 // module is trivially testable. All the money parsing, the landed-total math,

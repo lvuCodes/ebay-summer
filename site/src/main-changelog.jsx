@@ -1,3 +1,5 @@
+// eBay Σummer. Copyright (C) 2026 lvuCodes. Licensed under GPL-3.0-or-later; see LICENSE.md.
+
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import Changelog from "./pages/Changelog.jsx";

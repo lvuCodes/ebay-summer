@@ -1,3 +1,5 @@
+// eBay Σummer. Copyright (C) 2026 lvuCodes. Licensed under GPL-3.0-or-later; see LICENSE.md.
+//
 // The two registries that keep the core feature-agnostic. Loads FIRST (right
 // after nothing — it only touches ES), in both the content-script bundle and
 // the popup.

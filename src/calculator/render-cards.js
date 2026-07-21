@@ -1,3 +1,5 @@
+// eBay Σummer. Copyright (C) 2026 lvuCodes. Licensed under GPL-3.0-or-later; see LICENSE.md.
+//
 // Card-page renderers, ported from the console scripts in chrome-scripts.md.
 // One renderer per card-grid/row page: search, watchlist, bids & offers, My eBay
 // summary, recently viewed, saved feed, and the home feed. They use the shared

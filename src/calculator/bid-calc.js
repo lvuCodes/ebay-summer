@@ -1,3 +1,5 @@
+// eBay Σummer. Copyright (C) 2026 lvuCodes. Licensed under GPL-3.0-or-later; see LICENSE.md.
+//
 // DOM builder for the orange bid calculator (makeBidCalc). Depends on config
 // (state), the pure bid-calc helpers (calc.js), and the live-refresh glue +
 // shared per-unit state (live.js) — all pulled from ES at load time.

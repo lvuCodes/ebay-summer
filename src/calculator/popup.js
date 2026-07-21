@@ -1,3 +1,5 @@
+// eBay Σummer. Copyright (C) 2026 lvuCodes. Licensed under GPL-3.0-or-later; see LICENSE.md.
+//
 // Estimated Total Calculator — popup component. Registers two sections because
 // the feature presents as two groups: the rates themselves, and the per-page
 // switches deciding where boxes are injected. Both are calculator settings (the

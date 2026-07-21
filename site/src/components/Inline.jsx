@@ -1,3 +1,5 @@
+// eBay Σummer. Copyright (C) 2026 lvuCodes. Licensed under GPL-3.0-or-later; see LICENSE.md.
+
 import { tokenizeInline } from "../lib/inline.js";
 
 // Renders a changelog body string with `code` and *emphasis* markers as elements.

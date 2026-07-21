@@ -1,3 +1,5 @@
+// eBay Σummer. Copyright (C) 2026 lvuCodes. Licensed under GPL-3.0-or-later; see LICENSE.md.
+//
 // Auction-ending notifications — listing pages only (a single auction you're
 // viewing; deliberately not the bids/search pages, which have many simultaneous
 // countdowns and would fire a burst). Watches the page's countdown once a

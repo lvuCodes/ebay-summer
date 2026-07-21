@@ -1,3 +1,5 @@
+// eBay Σummer. Copyright (C) 2026 lvuCodes. Licensed under GPL-3.0-or-later; see LICENSE.md.
+//
 // Generic value sanitizers shared by content.js and the popup. Pure. Feature-
 // specific sanitizers live next to the keys they validate: the sound-key
 // sanitizer in sounds.js, and the tax-rate / Goldin / filter / emoji sanitizers

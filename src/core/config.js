@@ -1,3 +1,5 @@
+// eBay Σummer. Copyright (C) 2026 lvuCodes. Licensed under GPL-3.0-or-later; see LICENSE.md.
+//
 // Runtime settings object for the eBay Est.-Total extension.
 //
 // Modules communicate through a single shared namespace, `globalThis.ES`. In an
