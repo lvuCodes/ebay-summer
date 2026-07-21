@@ -60,6 +60,32 @@ a:hover {
   background-color: var(--purple-light);
 }
 
+/* ── Back link ── */
+.back-nav {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+}
+
+.pill {
+  display: inline-block;
+  border: 1px solid color-mix(in srgb, var(--purple) 40%, var(--purple-light));
+  background: var(--purple-light);
+  color: var(--purple);
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-size: .8rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.pill:hover {
+  background: color-mix(in srgb, var(--purple) 18%, var(--purple-light));
+  text-decoration: none;
+}
+
 .brand-stripe {
   height: 6px;
   display: flex;

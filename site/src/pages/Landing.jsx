@@ -1,3 +1,6 @@
+// eBay Σummer. Copyright (C) 2026 lvuCodes. Licensed under GPL-3.0-or-later; see LICENSE.md.
+
+import BackLink from "../components/BackLink.jsx";
 import BrandStripe from "../components/BrandStripe.jsx";
 import DemoWidgets from "../components/DemoWidgets.jsx";
 import { latestRelease } from "../lib/releases.js";
@@ -19,6 +22,7 @@ export default function Landing() {
   return (
     <>
       <BrandStripe />
+      <BackLink />
 
       <header className="hero">
         <img className="logo" src="assets/logo.png" alt="eBay Σummer logo" />

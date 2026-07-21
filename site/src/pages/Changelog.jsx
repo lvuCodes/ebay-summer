@@ -1,3 +1,6 @@
+// eBay Σummer. Copyright (C) 2026 lvuCodes. Licensed under GPL-3.0-or-later; see LICENSE.md.
+
+import BackLink from "../components/BackLink.jsx";
 import BrandStripe from "../components/BrandStripe.jsx";
 import Inline from "../components/Inline.jsx";
 import { listReleases, groupLabel, releaseUrl } from "../lib/releases.js";
@@ -10,6 +13,7 @@ export default function Changelog() {
   return (
     <>
       <BrandStripe />
+      <BackLink />
 
       <header className="page-head">
         <div className="wrap">
