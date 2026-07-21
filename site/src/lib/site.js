@@ -2,3 +2,6 @@
 
 export const REPO_URL = "https://github.com/lvuCodes/ebay-summer";
 export const LICENSE_URL = `${REPO_URL}/blob/main/LICENSE.md`;
+
+export const BACK_LINK_HREF = "https://lvucodes.github.io";
+export const BACK_LINK_LABEL = "← lvuCodes";
