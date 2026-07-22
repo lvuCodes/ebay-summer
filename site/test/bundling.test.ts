@@ -16,9 +16,11 @@ const ENTRIES: [string, string, string, string][] = [
 
 for (const [name, source, pageImport, lastCss] of ENTRIES) {
   test(`${name} entry imports site styles after the page component`, () => {
+    const themeIdx = source.indexOf('"@lvucodes/ui/theme.css"');
     const pageIdx = source.indexOf(pageImport);
     const baseIdx = source.indexOf('"./styles/base.css"');
-    expect(pageIdx).toBeGreaterThanOrEqual(0);
+    expect(themeIdx).toBeGreaterThanOrEqual(0);
+    expect(pageIdx).toBeGreaterThan(themeIdx);
     expect(baseIdx).toBeGreaterThan(pageIdx);
 
     // The site's own stylesheet is the final import statement in the entry.

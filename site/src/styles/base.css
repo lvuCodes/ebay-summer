@@ -1,6 +1,7 @@
 /* One fixed palette — the page owns its own background, so every visitor
    sees the same calm, light surface regardless of their OS theme. */
 :root {
+  color-scheme: light;
   --purple: #4b2e83;
   --purple-light: #eee8f4;
   --accent: var(--purple);

@@ -2,6 +2,7 @@
 
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import "@lvucodes/ui/theme.css";
 import Landing from "./pages/Landing.tsx";
 import { validateReleases } from "./lib/releases.ts";
 import releasesData from "./data/releases.json";
