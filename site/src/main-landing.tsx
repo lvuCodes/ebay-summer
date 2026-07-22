@@ -2,13 +2,15 @@
 
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import Landing from "./pages/Landing.jsx";
-import { validateReleases } from "./lib/releases.js";
+import Landing from "./pages/Landing.tsx";
+import { validateReleases } from "./lib/releases.ts";
 import releasesData from "./data/releases.json";
+// Site stylesheets come LAST, after the page component import that transitively
+// pulls in @lvucodes/ui's .pill primitive: equal-specificity, unlayered rules
+// resolve by source order, so importing base.css after the package lets the
+// site's own 999px purple .pill skin win. The extension's widget rules sit in
+// @layer extension, so index.css overrides them regardless of order.
 import "./styles/base.css";
-// The extension's own widget rules, extracted at build time. Imported BEFORE
-// index.css only for readability — it sits in @layer extension, so index.css
-// overrides it on cascade layer regardless of order.
 import "virtual:extension-widget-css.css";
 import "./styles/index.css";
 
@@ -17,7 +19,7 @@ import "./styles/index.css";
 // shape is a build-time defect the site author should see immediately.
 validateReleases(releasesData);
 
-createRoot(document.getElementById("root")).render(
+createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Landing />
   </StrictMode>,

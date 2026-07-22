@@ -1,10 +1,10 @@
 // eBay Σummer. Copyright (C) 2026 lvuCodes. Licensed under GPL-3.0-or-later; see LICENSE.md.
 
-import BackLink from "../components/BackLink.jsx";
-import BrandStripe from "../components/BrandStripe.jsx";
-import Inline from "../components/Inline.jsx";
-import { listReleases, groupLabel, releaseUrl } from "../lib/releases.js";
-import { REPO_URL, LICENSE_URL } from "../lib/site.js";
+import { BackLink } from "@lvucodes/ui";
+import BrandStripe from "../components/BrandStripe.tsx";
+import Inline from "../components/Inline.tsx";
+import { listReleases, groupLabel, releaseUrl } from "../lib/releases.ts";
+import { REPO_URL, LICENSE_URL } from "../lib/site.ts";
 import releasesData from "../data/releases.json";
 
 export default function Changelog() {
@@ -19,8 +19,12 @@ export default function Changelog() {
         <div className="wrap">
           <img className="logo" src="assets/logo.png" alt="eBay Σummer logo" />
           <h1>Changelog</h1>
-          <p className="lead">Release history for the eBay Σummer Chrome extension. Newest first.</p>
-          <a className="back-link" href="index.html">← Back to eBay Σummer</a>
+          <p className="lead">
+            Release history for the eBay Σummer Chrome extension. Newest first.
+          </p>
+          <a className="back-link" href="index.html">
+            ← Back to eBay Σummer
+          </a>
         </div>
       </header>
 
@@ -37,7 +41,10 @@ export default function Changelog() {
 
               {(r.groups || []).map((g) => (
                 <div className={`change-group ${g.type}`} key={g.type}>
-                  <h3><span className={`tag tag-${g.type}`} />{groupLabel(g.type)}</h3>
+                  <h3>
+                    <span className={`tag tag-${g.type}`} />
+                    {groupLabel(g.type)}
+                  </h3>
                   <ul>
                     {g.items.map((it, i) => (
                       <li key={i}>
@@ -52,7 +59,10 @@ export default function Changelog() {
 
               {r.package && (
                 <p className="assets">
-                  Package: <a href={releaseUrl(r.package)}><code>{r.package}</code></a>
+                  Package:{" "}
+                  <a href={releaseUrl(r.package) || undefined}>
+                    <code>{r.package}</code>
+                  </a>
                 </p>
               )}
             </article>
@@ -63,8 +73,13 @@ export default function Changelog() {
       <footer>
         <div className="wrap">
           <p className="sig">eBay Σummer · Manifest V3 Chrome extension</p>
-          <p>Not affiliated with eBay Inc. · <a href="index.html">Home</a> · <a href={REPO_URL}>Source on GitHub</a></p>
-          <p className="copyright">© 2026 lvuCodes · Licensed under <a href={LICENSE_URL}>GPL-3.0</a></p>
+          <p>
+            Not affiliated with eBay Inc. · <a href="index.html">Home</a> ·{" "}
+            <a href={REPO_URL}>Source on GitHub</a>
+          </p>
+          <p className="copyright">
+            © 2026 lvuCodes · Licensed under <a href={LICENSE_URL}>GPL-3.0</a>
+          </p>
         </div>
       </footer>
     </>

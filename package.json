@@ -6,7 +6,9 @@
   "scripts": {
     "test": "node --test \"test/*.test.js\"",
     "test:coverage": "node --test --experimental-test-coverage --test-coverage-lines=75 --test-coverage-branches=91 --test-coverage-functions=77 \"test/*.test.js\"",
-    "verify": "npm run test:coverage && npm --prefix site run test:coverage && npm --prefix site run build",
+    "verify": "npm run test:coverage && npm --prefix site run verify",
+    "smoke": "npm --prefix site run smoke",
+    "postinstall": "npm --prefix site ci",
     "prepare": "git config core.hooksPath .githooks"
   }
 }

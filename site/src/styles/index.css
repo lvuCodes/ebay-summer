@@ -1,3 +1,6 @@
+/* stylelint-disable selector-class-pattern -- the demo overrides target the
+   extension's own BEM class names (ebay-estimation__*, ebay-bid-calc__*, --lg),
+   which are fixed by the extension and matched verbatim by DEMO_CLASSES. */
 .wrap {
   width: min(80%, 1400px);
   margin: 0 auto;
@@ -101,7 +104,7 @@ a.version-badge:hover {
 }
 
 .btn-ghost {
-  background: var(--bg-card);
+  background: var(--panel);
   color: var(--text);
   border-color: var(--border);
   box-shadow: var(--shadow);
@@ -248,7 +251,7 @@ h2.section-title {
 }
 
 .card {
-  background: var(--bg-card);
+  background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 14px;
   padding: 22px;

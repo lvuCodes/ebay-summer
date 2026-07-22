@@ -1,21 +1,45 @@
 // eBay Σummer. Copyright (C) 2026 lvuCodes. Licensed under GPL-3.0-or-later; see LICENSE.md.
 //
 // Framework-free helpers over the releases data. Kept React-free so they can be
-// unit-tested under node:test and reused by any future data source (e.g. a
-// GitHub Releases fetch) without touching the render layer.
+// unit-tested under Vitest and reused by any future data source (e.g. a GitHub
+// Releases fetch) without touching the render layer.
 
-import { REPO_URL } from "./site.js";
+import { REPO_URL } from "./site.ts";
 
-export function listReleases(data) {
+export type GroupType = "added" | "fixed" | "changed" | "known-issues";
+
+export interface ReleaseItem {
+  lead?: string;
+  body?: string;
+}
+
+export interface ReleaseGroup {
+  type: string;
+  items: ReleaseItem[];
+}
+
+export interface Release {
+  version: string;
+  date: string;
+  summary?: string;
+  package?: string;
+  groups?: ReleaseGroup[];
+}
+
+export interface ReleasesData {
+  releases?: Release[];
+}
+
+export function listReleases(data: ReleasesData | null | undefined): Release[] {
   const releases = data && Array.isArray(data.releases) ? data.releases : [];
   return releases.slice().sort((a, b) => cmpVersion(b.version, a.version));
 }
 
-export function latestRelease(data) {
+export function latestRelease(data: ReleasesData | null | undefined): Release | null {
   return listReleases(data)[0] || null;
 }
 
-export function cmpVersion(a, b) {
+export function cmpVersion(a: string, b: string): number {
   const pa = parseVersion(a);
   const pb = parseVersion(b);
   for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
@@ -25,7 +49,7 @@ export function cmpVersion(a, b) {
   return 0;
 }
 
-function parseVersion(v) {
+function parseVersion(v: string): number[] {
   return String(v == null ? "" : v)
     .split(".")
     .map((n) => {
@@ -36,24 +60,24 @@ function parseVersion(v) {
 
 // The zips live in the repo, not in docs/, so a page-relative href would 404 on
 // Pages. /raw/ serves the bytes as a download rather than GitHub's blob viewer.
-export function releaseUrl(path) {
+export function releaseUrl(path: string | null | undefined): string | null {
   return path ? `${REPO_URL}/raw/main/${path}` : null;
 }
 
-const GROUP_LABELS = {
+const GROUP_LABELS: Record<string, string> = {
   added: "Added",
   fixed: "Fixed",
   changed: "Changed",
   "known-issues": "Known Issues",
 };
 
-export function groupLabel(type) {
+export function groupLabel(type: string): string {
   return GROUP_LABELS[type] || String(type || "");
 }
 
 // Throws on a malformed entry so a bad releases.json fails the build/tests loudly
 // instead of rendering a broken changelog.
-export function validateReleases(data) {
+export function validateReleases(data: ReleasesData | null | undefined): boolean {
   const releases = listReleases(data);
   if (releases.length === 0) throw new Error("releases.json has no releases");
   for (const r of releases) {

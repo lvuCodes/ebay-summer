@@ -52,7 +52,7 @@ main {
 }
 
 .release {
-  background: var(--bg-card);
+  background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 16px;
   padding: 26px 28px;

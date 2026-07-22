@@ -3,6 +3,8 @@
 :root {
   --purple: #4b2e83;
   --purple-light: #eee8f4;
+  --accent: var(--purple);
+  --on-accent: #fff;
   --orange: #b35a00;
   --orange-light: #fff4e6;
   --amber: #8a6100;
@@ -12,8 +14,8 @@
   --ebay-yellow: #f5af02;
   --ebay-green: #86b817;
 
-  --bg-page: #dcdcdc;
-  --bg-card: #efefef;
+  --bg: #dcdcdc;
+  --panel: #efefef;
   --bg-elev: #f4f4f4;
   --text: #1c1c1c;
   --text-soft: #4a4a4a;
@@ -33,7 +35,7 @@
 
 html {
   scroll-behavior: smooth;
-  background: var(--bg-page);
+  background: var(--bg);
 }
 
 body {
@@ -41,7 +43,7 @@ body {
   font-family: var(--font-sans);
   background:
     radial-gradient(1100px 520px at 50% -10%, color-mix(in srgb, var(--purple) 16%, transparent) 0%, transparent 62%),
-    var(--bg-page);
+    var(--bg);
   background-attachment: fixed;
   color: var(--text);
   line-height: 1.55;
@@ -51,7 +53,7 @@ body {
 a {
   color: var(--purple);
   text-decoration: underline;
-  padding: 0px 2px;
+  padding: 0 2px;
   border-radius: 6px;
 }
 
@@ -60,13 +62,10 @@ a:hover {
   background-color: var(--purple-light);
 }
 
-/* ── Back link ── */
-.back-nav {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-}
-
+/* ── Back link ──
+   Placement (absolute 20/20) comes from @lvucodes/ui's back-link.css. The site
+   keeps its own .pill skin below, which wins over the package's 6px primitive
+   because the site stylesheets are imported last (see main-landing.tsx). */
 .pill {
   display: inline-block;
   border: 1px solid color-mix(in srgb, var(--purple) 40%, var(--purple-light));

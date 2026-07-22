@@ -1,7 +1,7 @@
 // eBay Σummer. Copyright (C) 2026 lvuCodes. Licensed under GPL-3.0-or-later; see LICENSE.md.
 //
 // Bridges the extension's widget CSS into the site, the visual counterpart to
-// extension-calc.js. css-box.js / css-widgets.js are classic scripts that seed
+// extension-calc.ts. css-box.js / css-widgets.js are classic scripts that seed
 // globalThis.ES with their stylesheets as template-literal strings, so the same
 // side-effect-import trick applies here.
 //
@@ -24,15 +24,15 @@
 // The filter is an allowlist, not a denylist: a selector survives only if every
 // class it names is one the demo can actually produce. A new extension variant
 // therefore drops out on its own instead of needing this list updated, and
-// extension-css.test.js pins DEMO_CLASSES against the demo's real sources so
+// extension-css.test.ts pins DEMO_CLASSES against the demo's real sources so
 // adding a class to the markup without listing it here fails the build.
 // This module is pure — it does NOT import the extension stylesheets itself.
-// The extraction runs once in vite.config.js at build time (see loadWidgetCss),
+// The extraction runs once in vite.config.ts at build time (see loadWidgetCss),
 // so the raw CSS strings never enter the JS bundle and the result is emitted as
 // a real stylesheet: smaller, preloadable, and no flash of unstyled widgets.
 
-// Every class DemoWidgets.jsx renders or demo-controller.js toggles at runtime.
-export const DEMO_CLASSES = new Set([
+// Every class DemoWidgets.tsx renders or demo-controller.ts toggles at runtime.
+export const DEMO_CLASSES = new Set<string>([
   "ebay-estimation",
   "ebay-estimation--lg",
   "ebay-estimation__body",
@@ -75,8 +75,8 @@ export const DEMO_CLASSES = new Set([
 
 // The extension stylesheets are flat — no @media/@supports/@keyframes — so
 // splitting on "}" is sufficient and avoids pulling in a CSS parser.
-export function filterToDemoClasses(css) {
-  const out = [];
+export function filterToDemoClasses(css: string): string {
+  const out: string[] = [];
   for (const block of css.replace(/\/\*[\s\S]*?\*\//g, "").split("}")) {
     const brace = block.indexOf("{");
     if (brace === -1) continue;
@@ -86,7 +86,9 @@ export function filterToDemoClasses(css) {
       .slice(0, brace)
       .split(",")
       .map((s) => s.trim())
-      .filter((s) => s && [...s.matchAll(/\.([A-Za-z0-9_-]+)/g)].every((m) => DEMO_CLASSES.has(m[1])));
+      .filter(
+        (s) => s && [...s.matchAll(/\.([A-Za-z0-9_-]+)/g)].every((m) => DEMO_CLASSES.has(m[1])),
+      );
     if (kept.length) out.push(`${kept.join(", ")} { ${body} }`);
   }
   return out.join("\n");
@@ -95,7 +97,7 @@ export function filterToDemoClasses(css) {
 // Build-time only: pulls the extension's stylesheets in via their globalThis.ES
 // side effect, then strips and filters them. Called from the Vite plugin, never
 // from browser code.
-export async function loadWidgetCss() {
+export async function loadWidgetCss(): Promise<string> {
   await import("../../../src/calculator/css-box.js");
   await import("../../../src/calculator/css-widgets.js");
   const ES = globalThis.ES;

@@ -1,0 +1,10 @@
+dist
+coverage
+node_modules
+package-lock.json
+playwright-report
+test-results
+../docs
+
+# Stylesheets are hand-formatted and linted by stylelint instead.
+**/*.css

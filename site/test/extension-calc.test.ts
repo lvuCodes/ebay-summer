@@ -3,10 +3,9 @@
 // it again here would rebuild the duplication the bridge exists to remove. What
 // is site-specific, and what actually breaks silently, is the seam: that the
 // classic-script import still populates globalThis.ES and still exposes every
-// binding demo-controller.js destructures.
-import { test } from "node:test";
-import assert from "node:assert/strict";
-import * as calc from "../src/lib/extension-calc.js";
+// binding demo-controller.ts destructures.
+import { test, expect } from "vitest";
+import * as calc from "../src/lib/extension-calc.ts";
 
 const REQUIRED = [
   "fmtMoney",
@@ -20,35 +19,35 @@ const REQUIRED = [
   "bidFromTotalParts",
 ];
 
-test("bridge: every binding demo-controller.js imports resolves to a function", () => {
+test("bridge: every binding demo-controller.ts imports resolves to a function", () => {
   for (const name of REQUIRED) {
-    assert.equal(typeof calc[name], "function", `${name} missing from the bridge`);
+    expect(typeof calc[name], `${name} missing from the bridge`).toBe("function");
   }
 });
 
 test("bridge: exports are the extension's own functions, not a re-implementation", () => {
   // globalThis.ES is the extension's namespace, seeded by the side-effect import.
   for (const name of REQUIRED) {
-    assert.equal(calc[name], globalThis.ES[name], `${name} is not the extension's function`);
+    expect(calc[name], `${name} is not the extension's function`).toBe(globalThis.ES[name]);
   }
 });
 
 test("bridge: non-finite money uses the extension's 0.00 guard", () => {
   // The site's old fork rendered "NaN" here. Pinning it catches a regression to
   // any local re-implementation, which would not carry this guard.
-  assert.equal(calc.fmtMoney(NaN), "0.00");
-  assert.equal(calc.fmtMoney(undefined), "0.00");
+  expect(calc.fmtMoney(NaN)).toBe("0.00");
+  expect(calc.fmtMoney(undefined)).toBe("0.00");
 });
 
 test("bridge: the demo's own call shapes still behave", () => {
   // One spot-check per function the demo calls, guarding signature drift (e.g.
   // shipLabel gaining a required second arg) rather than re-testing the math.
-  assert.equal(calc.fmtMoney(1234.5), "1,234.50");
-  assert.equal(calc.pctText(0.0825), "8.25%");
-  assert.deepEqual(calc.calcTotal(100, 10, 0.0825), { tax: 8.25, total: 118.25 });
-  assert.equal(calc.shipLabel(0), "+ free ship");
-  assert.equal(calc.shipLabel(-1), "+ ship n/a");
-  assert.equal(calc.clampCount(0), 1);
-  assert.equal(calc.evalExpr("2 + 3 * 4"), 14);
-  assert.deepEqual(calc.bidCalcInput("$1,299.00"), { isFunction: false, value: 1299 });
+  expect(calc.fmtMoney(1234.5)).toBe("1,234.50");
+  expect(calc.pctText(0.0825)).toBe("8.25%");
+  expect(calc.calcTotal(100, 10, 0.0825)).toEqual({ tax: 8.25, total: 118.25 });
+  expect(calc.shipLabel(0)).toBe("+ free ship");
+  expect(calc.shipLabel(-1)).toBe("+ ship n/a");
+  expect(calc.clampCount(0)).toBe(1);
+  expect(calc.evalExpr("2 + 3 * 4")).toBe(14);
+  expect(calc.bidCalcInput("$1,299.00")).toEqual({ isFunction: false, value: 1299 });
 });

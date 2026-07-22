@@ -2,9 +2,12 @@
 
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import Changelog from "./pages/Changelog.jsx";
-import { validateReleases } from "./lib/releases.js";
+import Changelog from "./pages/Changelog.tsx";
+import { validateReleases } from "./lib/releases.ts";
 import releasesData from "./data/releases.json";
+// Site stylesheets come LAST, after the page component import that transitively
+// pulls in @lvucodes/ui's .pill primitive, so the site's own 999px purple .pill
+// skin wins on source order (see main-landing.tsx).
 import "./styles/base.css";
 import "./styles/changelog.css";
 
@@ -13,7 +16,7 @@ import "./styles/changelog.css";
 // shape is a build-time defect the site author should see immediately.
 validateReleases(releasesData);
 
-createRoot(document.getElementById("root")).render(
+createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Changelog />
   </StrictMode>,

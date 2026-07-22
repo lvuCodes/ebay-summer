@@ -5,19 +5,44 @@
   "license": "GPL-3.0-or-later",
   "private": true,
   "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "prettier": "@lvucodes/ui/prettier",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "test": "node --test \"test/*.test.js\"",
-    "test:coverage": "node --test --experimental-test-coverage --test-coverage-exclude=\"../src/**\" --test-coverage-exclude=\"../test/**\" --test-coverage-lines=98 --test-coverage-branches=94 --test-coverage-functions=95 \"test/*.test.js\""
+    "lint": "eslint . && stylelint \"src/**/*.css\"",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest watch",
+    "test:coverage": "vitest run --coverage",
+    "presmoke": "npm run build",
+    "smoke": "playwright test",
+    "verify": "npm run lint && npm run format:check && npm run test:coverage && npm run build"
   },
   "dependencies": {
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "@lvucodes/ui": "^0.1.0",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^6.0.3",
-    "vite": "^8.1.5"
+    "@playwright/test": "^1.57.0",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/react": "^16.3.2",
+    "@types/node": "^24.12.3",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.1",
+    "@vitest/coverage-v8": "^4.1.10",
+    "eslint": "^10.3.0",
+    "jsdom": "^29.1.1",
+    "prettier": "^3.9.5",
+    "stylelint": "^17.14.1",
+    "typescript": "~6.0.2",
+    "vite": "^8.0.12",
+    "vitest": "^4.1.7"
   }
 }
