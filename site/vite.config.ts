@@ -30,6 +30,7 @@ export default defineConfig({
   // and the multi-MB logged-in eBay captures in debug/. The production build
   // inlines the import and is unaffected either way.
   server: {
+    port: 5818,
     fs: { allow: [resolve(import.meta.dirname, "../src/calculator"), import.meta.dirname] },
   },
   build: {
