@@ -1,11 +1,11 @@
 # AI Usage
 
-**3.6% AI, 96.4% human**, by lines added since the baseline commit.
+**99.3% AI, 0.7% human**, by lines added since the baseline commit.
 
 | Measure | Lines added |
 |---|---|
-| **By Claude** | 10 |
-| **By the author** | 264 |
+| **By Claude** | 272 |
+| **By the author** | 2 |
 | **Total since baseline** | 274 |
 
 Baseline commit `3b0102a` (2026-10-05). Regenerate with `node scripts/ai-attribution.mjs`.
@@ -34,4 +34,4 @@ Baseline commit `3b0102a` (2026-10-05). Regenerate with `node scripts/ai-attribu
 - `site/coverage/**`
 - `site/test-results/**`
 
-_Generated 2026-10-05 23:50:47Z.
+_Generated 2026-10-05 23:51:21Z.
