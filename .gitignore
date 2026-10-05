@@ -18,3 +18,6 @@ node_modules/
 # Saved eBay page captures for selector debugging (multi-MB, not source)
 debug/
 references/
+
+# AI-attribution transient pre-edit snapshots
+.ai-attribution/snapshots/.tmp/

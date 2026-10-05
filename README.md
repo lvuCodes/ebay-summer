@@ -57,3 +57,5 @@ Full behaviour, the complete settings-key reference, and implementation notes li
 
 Copyright © 2026 lvuCodes. Licensed under [GPL-3.0-or-later](LICENSE.md).
 
+AI authorship is disclosed in [AI-USAGE.md](AI-USAGE.md).
+
