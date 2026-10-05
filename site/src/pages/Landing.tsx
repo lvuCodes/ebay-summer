@@ -5,7 +5,7 @@ import { BackLink } from "@lvucodes/ui";
 import BrandStripe from "../components/BrandStripe.tsx";
 import DemoWidgets from "../components/DemoWidgets.tsx";
 import { latestRelease } from "../lib/releases.ts";
-import { REPO_URL, LICENSE_URL } from "../lib/site.ts";
+import { REPO_URL, LICENSE_URL, CHROME_STORE_URL } from "../lib/site.ts";
 import releasesData from "../data/releases.json";
 
 interface Feature {
@@ -83,7 +83,7 @@ export default function Landing() {
           see the total cost (item price + sales tax + shipping) at a glance.
         </p>
         <div className="cta-row">
-          <a className="btn btn-primary" href={REPO_URL}>
+          <a className="btn btn-primary" href={CHROME_STORE_URL}>
             Chrome Web Store ↗
           </a>
         </div>
