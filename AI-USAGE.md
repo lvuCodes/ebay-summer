@@ -4,9 +4,9 @@
 
 | Measure | Lines added |
 |---|---|
-| **By Claude** | 272 |
+| **By Claude** | 290 |
 | **By the author** | 2 |
-| **Total since baseline** | 274 |
+| **Total since baseline** | 292 |
 
 Baseline commit `3b0102a` (2026-10-05). Regenerate with `node scripts/ai-attribution.mjs`.
 
@@ -34,4 +34,4 @@ Baseline commit `3b0102a` (2026-10-05). Regenerate with `node scripts/ai-attribu
 - `site/coverage/**`
 - `site/test-results/**`
 
-_Generated 2026-10-05 23:51:21Z.
+_Generated 2026-10-06 15:38:44Z.
