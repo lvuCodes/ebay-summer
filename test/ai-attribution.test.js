@@ -60,6 +60,7 @@ test("main: excluded authors leave the report current", async () => {
   const { execFileSync } = require("node:child_process");
   const { join } = require("node:path");
   const root = mkdtempSync(join(require("node:os").tmpdir(), "ai-attr-"));
+  for (const key of Object.keys(process.env)) if (key.startsWith("GIT_")) delete process.env[key];
   const git = (args, name = "Lauren Vu") =>
     execFileSync("git", ["-C", root, "-c", `user.name=${name}`, "-c", "user.email=a@b.c", ...args], { encoding: "utf8" });
   const commit = (file, lines, name) => {
