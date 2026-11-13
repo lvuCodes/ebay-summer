@@ -6,7 +6,7 @@ A Manifest V3 Chrome extension that shows the approximate total cost — **item 
 
 ## Install
 
-1. Download [`releases/v1.2.0.zip`](releases/v1.2.0.zip) and unzip it.
+1. Download [`v1.2.0.zip`](https://github.com/lvuCodes/ebay-summer/releases/download/v1.2.0/v1.2.0.zip) from the v1.2.0 release and unzip it.
 2. Open `chrome://extensions` and enable **Developer mode** (top right).
 3. **Load unpacked** → select the unzipped `v1.2.0/` folder.
 4. Visit an eBay listing, search, or bids/offers page — the boxes appear automatically.
