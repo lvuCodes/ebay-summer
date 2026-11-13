@@ -6,6 +6,7 @@ import BrandStripe from "../components/BrandStripe.tsx";
 import DemoWidgets from "../components/DemoWidgets.tsx";
 import { latestRelease } from "../lib/releases.ts";
 import { REPO_URL, LICENSE_URL, CHROME_STORE_URL } from "../lib/site.ts";
+import { RepoLink } from "../components/RepoLink.tsx";
 import releasesData from "../data/releases.json";
 
 interface Feature {
@@ -147,8 +148,7 @@ export default function Landing() {
         <div className="wrap">
           <p className="sig">eBay Σummer · Chrome extension</p>
           <p>
-            Not affiliated with eBay Inc. · <a href="changelog.html">Changelog</a> ·{" "}
-            <a href={REPO_URL}>Source on GitHub</a>
+            Not affiliated with eBay Inc. · <a href="changelog.html">Changelog</a> · <RepoLink />
           </p>
           <p className="copyright">
             © 2026 lvuCodes · Licensed under <a href={LICENSE_URL}>GPL-3.0</a>
