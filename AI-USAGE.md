@@ -4,9 +4,9 @@
 
 | Measure | Lines added |
 |---|---|
-| **By Claude** | 688 |
+| **By Claude** | 706 |
 | **By the author** | 2 |
-| **Total since baseline** | 690 |
+| **Total since baseline** | 708 |
 
 Baseline commit `3b0102a` (2026-10-05). Regenerate with `node scripts/ai-attribution.mjs`.
 
@@ -17,6 +17,7 @@ Baseline commit `3b0102a` (2026-10-05). Regenerate with `node scripts/ai-attribu
 | `ci` | 2 | 348 | 0 |
 | `unlabeled` | 3 | 272 | 2 |
 | `release` | 1 | 68 | 0 |
+| `docs` | 1 | 18 | 0 |
 
 ## Measurement Scope
 
@@ -43,4 +44,4 @@ Baseline commit `3b0102a` (2026-10-05). Regenerate with `node scripts/ai-attribu
 - `site/coverage/**`
 - `site/test-results/**`
 
-_Generated 2026-11-13 15:56:09Z.
+_Generated 2026-11-13 15:59:47Z.
