@@ -1,6 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "eBay Σummer",
+  "name": "eBay Summer",
+  "short_name": "eBay Σummer",
   "version": "1.2.0",
   "description": "Shows the approx. total cost (item + item only sales tax + shipping) on eBay listing, search, and bids/offers pages.",
   "permissions": [

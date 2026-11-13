@@ -4,7 +4,8 @@ import { BackLink } from "@lvucodes/ui";
 import BrandStripe from "../components/BrandStripe.tsx";
 import Inline from "../components/Inline.tsx";
 import { listReleases, groupLabel, releaseUrl } from "../lib/releases.ts";
-import { REPO_URL, LICENSE_URL } from "../lib/site.ts";
+import { LICENSE_URL } from "../lib/site.ts";
+import { RepoLink } from "../components/RepoLink.tsx";
 import releasesData from "../data/releases.json";
 
 export default function Changelog() {
@@ -74,8 +75,7 @@ export default function Changelog() {
         <div className="wrap">
           <p className="sig">eBay Σummer · Manifest V3 Chrome extension</p>
           <p>
-            Not affiliated with eBay Inc. · <a href="index.html">Home</a> ·{" "}
-            <a href={REPO_URL}>Source on GitHub</a>
+            Not affiliated with eBay Inc. · <a href="index.html">Home</a> · <RepoLink />
           </p>
           <p className="copyright">
             © 2026 lvuCodes · Licensed under <a href={LICENSE_URL}>GPL-3.0</a>
